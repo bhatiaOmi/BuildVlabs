@@ -53,20 +53,20 @@
       "difficulty": "beginner"
     },
     {
-      "question": "Which of the following statements about Merge Sort is TRUE?",
+      "question": "Which of the following is a common application of sorting algorithms?",
       "answers": {
-        "a": "It is an in-place sorting algorithm",
-        "b": "Its performance depends on input order",
-        "c": "It uses extra memory for merging",
-        "d": "It has a worst-case time complexity of O(n²)"
+        "a": "Encrypting data",
+        "b": "Searching data efficiently",
+        "c": "Compressing files",
+        "d": "Generating random numbers"
       },
       "explanations": {
-        "a": "Merge Sort requires additional memory.",
-        "b": "Merge Sort performance is independent of input order.",
-        "c": "Extra memory is used to merge subarrays.",
-        "d": "Its worst-case time complexity is O(n log n)."
+        "a": "Encryption is related to security, not sorting.",
+        "b": "Sorting helps improve the efficiency of searching algorithms like binary search.",
+        "c": "File compression does not rely on sorting.",
+        "d": "Random number generation does not require sorted data."
       },
-      "correctAnswer": "c",
+      "correctAnswer": "b",
       "difficulty": "beginner"
     },
     {

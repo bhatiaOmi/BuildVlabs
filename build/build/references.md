@@ -8,8 +8,4 @@ Introduction to Algorithms, 3rd Edition, MIT Press, 2009.
 Algorithms, 4th Edition, Addison-Wesley, 2011.
 – Detailed explanation of Quick Sort optimizations, including median-of-three pivot selection.
 
-3. Practical algorithm explanations and step-by-step working examples.
-(GitHub Repository)
-QuickSort using Median-of-Three Pivot Selection
-https://github.com/taky2/QuickSort-Median-of-3/blob/master/QuicksortMedian3.java
 

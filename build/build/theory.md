@@ -1,50 +1,95 @@
-Sorting is a fundamental operation in computer science that involves arranging elements of a dataset in a specified order, typically ascending or descending. Efficient sorting is crucial for optimizing searching, data processing, and algorithm performance. Among the various sorting techniques, Divide and Conquer–based algorithms are widely used due to their efficiency and systematic problem-solving approach.
+### Introduction
 
-#### Divide and Conquer Paradigm
-The divide and conquer technique works by:
-   1. Dividing a problem into smaller sub-problems of the same type.
-   2. Conquering the sub-problems by solving them recursively.
-   3. Combining the solutions of the sub-problems to form the final solution
-This approach significantly reduces computational complexity for large input sizes and forms the basis of efficient algorithms like Merge Sort and Quick Sort.
+Sorting is a fundamental operation in computer science that involves arranging elements of a dataset in a specified order, typically in ascending or descending order. Efficient sorting is crucial because many core operations such as searching, indexing, data analysis, and optimization perform significantly better on sorted data.
 
-#### Merge Sort
+Among various sorting techniques, Divide and Conquer–based algorithms are widely used due to their efficiency and systematic problem-solving approach. These algorithms decompose a large problem into smaller subproblems, solve them independently, and combine their solutions to obtain the final result. Two prominent sorting algorithms based on this paradigm are Merge Sort and Quick Sort.
 
-Merge Sort is a stable, comparison-based sorting algorithm that follows a top-down divide and conquer strategy.
+---
+### Divide and Conquer Paradigm
 
-#### Working Principle:
-  1. The array is recursively divided into two halves until each subarray contains only one element
-  2. These subarrays are then merged in a sorted manner to produce larger sorted subarrays.
-  3. The merging process continues until the entire array is sorted.
+The Divide and Conquer strategy operates through the following three fundamental steps:
 
-#### Characteristics:
-  1. Time Complexity:
-    a. Best Case: O(n log n),
-    b. Average Case: O(n log n),
-    c. Worst Case: O(n log n)
-  2. Requires additional auxiliary memory for merging.
-  3. Guarantees consistent performance regardless of input order.
-Merge Sort is especially useful when working with large datasets or external sorting where stability and predictable performance are important.
+- **Divide**
+  - The main problem is divided into smaller subproblems of the same type.
 
-#### Quick Sort
-Quick Sort is an efficient, in-place sorting algorithm that also uses the divide and conquer approach but differs significantly in its partitioning method.
+- **Conquer**
+  - Each subproblem is solved recursively until it becomes simple enough to solve directly.
 
-#### Working Principle (Median-of-Three Pivot Selection):
-1. A pivot element is selected as the median of the first, middle, and last elements of the array.
-2. Two pointers, P (left to right) and Q (right to left), traverse the array.
-3. Elements smaller than or equal to the pivot are moved to the left, and larger elements to the right.
-4. When pointers cross, the pivot is placed in its correct position.
-5. The process is recursively applied to the left and right subarrays.
+- **Combine**
+  - The solutions of the subproblems are combined to form the final solution.
 
-####  Characteristics:
-  1. Time Complexity:
-    a. Best Case: O(n log n),
-    b. Average Case: O(n log n),
-    c. Worst Case: O(n²) (rare with median-of-three strategy)
-  2. Requires no extra memory (in-place sorting).
-  3. Performance depends on pivot selection and input distribution.
+This paradigm significantly reduces computational complexity for large input sizes and forms the theoretical foundation of efficient algorithms such as Merge Sort and Quick Sort.
 
-The median-of-three approach minimizes the probability of worst-case behavior by avoiding poor pivot choices for already sorted or reverse-sorted arrays.
+---
+### Merge Sort
 
+Merge Sort is a stable, comparison-based sorting algorithm that strictly follows the divide and conquer approach. It uses a top-down recursive strategy and provides predictable performance irrespective of input order.
 
+#### Working Principle
 
+- The array is recursively divided into two halves until each subarray contains only one element.
+- A single element is inherently sorted.
+- Adjacent subarrays are merged in sorted order to form larger sorted subarrays.
+- This merging process continues until the entire array is merged into one fully sorted array.
 
+#### Characteristics of Merge Sort
+
+- **Time Complexity**
+  - Best Case: O(n log n)
+  - Average Case: O(n log n)
+  - Worst Case: O(n log n)
+
+- **Stability**
+  - Preserves the relative order of equal elements.
+
+- **Memory Requirement**
+  - Requires additional auxiliary space for merging subarrays.
+
+- **Performance**
+  - Predictable and independent of input order.
+
+Merge Sort is particularly suitable for large datasets, linked lists, and external sorting where stability and consistent performance are required.
+
+---
+### Quick Sort
+
+Quick Sort is a highly efficient in-place sorting algorithm that also follows the divide and conquer strategy. Unlike Merge Sort, it does not require extra memory for merging but relies on an effective partitioning technique.
+
+In this implementation, the Median-of-Three pivot selection method is used to improve performance.
+
+#### Working Principle (Median-of-Three Pivot Selection)
+
+- The pivot element is selected as the median of:
+  - The first element
+  - The middle element
+  - The last element
+
+- This strategy reduces the chances of poor pivot selection.
+
+- Two pointers are used:
+  - Pointer **i** moves from left to right.
+  - Pointer **j** moves from right to left.
+
+- Elements less than or equal to the pivot are moved to the left side, while elements greater than the pivot are moved to the right side.
+
+- When the pointers cross, the pivot is placed in its correct sorted position.
+
+- The same process is recursively applied to the left and right subarrays.
+
+#### Characteristics of Quick Sort
+
+- **Time Complexity**
+  - Best Case: O(n log n)
+  - Average Case: O(n log n)
+  - Worst Case: O(n²) (rare with median-of-three strategy)
+
+- **Memory Usage**
+  - In-place algorithm; no additional auxiliary memory required.
+
+- **Stability**
+  - Not stable; relative order of equal elements may change.
+
+- **Performance Dependency**
+  - Highly dependent on pivot selection and input distribution.
+
+The median-of-three pivot selection significantly reduces the probability of worst-case behavior, making Quick Sort efficient for practical applications.

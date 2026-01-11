@@ -190,6 +190,18 @@
                               </div>
                               <div>
                                   <div class="d-flex nav-menu-body">
+                                      <a href="contributors.html" class="p-2 ">
+                                      Contributors
+                                      </a>
+                                      
+                                  </div>
+                                  <div id="t-" class="collapse">
+                                      <div class="px-3 d-flex flex-column tasks align-items-center align-items-lg-start">
+                                      </div>
+                                  </div>
+                              </div>
+                              <div>
+                                  <div class="d-flex nav-menu-body">
                                       <a href="feedback.html" class="p-2 ">
                                       Feedback
                                       </a>
@@ -281,6 +293,18 @@
                     <div class="d-flex nav-menu-body">
                         <a href="references.html" class="p-2 ">
                         References
+                        </a>
+                        
+                    </div>
+                    <div id="t-" class="collapse">
+                        <div class="px-3 d-flex flex-column tasks align-items-center align-items-lg-start">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex nav-menu-body">
+                        <a href="contributors.html" class="p-2 ">
+                        Contributors
                         </a>
                         
                     </div>
@@ -449,14 +473,14 @@
                 </div>
                 
                   <div class="question beginner">
-                    Which of the following statements about Merge Sort is TRUE?
+                    Which of the following is a common application of sorting algorithms?
                   </div>
                   
                   <div class="answers">
                     <div id="answer3a">
                       <label>
                         <input type="radio" name="question3" value="a">
-                        a: It is an in-place sorting algorithm
+                        a: Encrypting data
                       </label>
                       <a href="#" id="explanation3a" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -464,7 +488,7 @@
                     <div id="answer3b">
                       <label>
                         <input type="radio" name="question3" value="b">
-                        b: Its performance depends on input order
+                        b: Searching data efficiently
                       </label>
                       <a href="#" id="explanation3b" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -472,7 +496,7 @@
                     <div id="answer3c">
                       <label>
                         <input type="radio" name="question3" value="c">
-                        c: It uses extra memory for merging
+                        c: Compressing files
                       </label>
                       <a href="#" id="explanation3c" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -480,7 +504,7 @@
                     <div id="answer3d">
                       <label>
                         <input type="radio" name="question3" value="d">
-                        d: It has a worst-case time complexity of O(n²)
+                        d: Generating random numbers
                       </label>
                       <a href="#" id="explanation3d" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -531,7 +555,7 @@
           </div>
             
             <script>
-              const myQuestions = [{"question":"Which of the following best describes the divide and conquer technique?","answers":{"a":"Solving a problem by trying all possible solutions","b":"Dividing a problem into smaller sub-problems, solving them, and combining the results","c":"Solving a problem iteratively using loops","d":"Sorting elements by comparing adjacent values"},"explanations":{"a":"This describes brute-force techniques, not divide and conquer.","b":"Divide and conquer works by breaking a problem into smaller parts, solving them recursively, and combining results.","c":"Iterative approaches use loops rather than recursion.","d":"This describes bubble sort, not the divide and conquer paradigm."},"correctAnswer":"b","difficulty":"beginner"},{"question":"What is the primary reason for using sorting algorithms in computer science?","answers":{"a":"To reduce memory usage","b":"To improve data security","c":"To organize data for efficient searching and processing","d":"To increase program length"},"explanations":{"a":"Sorting may increase memory usage depending on the algorithm.","b":"Sorting does not directly improve security.","c":"Sorted data allows faster searching and easier data processing.","d":"Program length is unrelated to sorting."},"correctAnswer":"c","difficulty":"beginner"},{"question":"What is the time complexity of Merge Sort in the worst case?","answers":{"a":"O(n)","b":"O(n log n)","c":"O(n²)","d":"O(log n)"},"explanations":{"a":"Merge Sort always processes all elements at each level.","b":"Merge Sort divides the array log n times and merges n elements at each level.","c":"Quadratic time is typical of simple sorts like bubble sort.","d":"Logarithmic time alone is insufficient to process all elements."},"correctAnswer":"b","difficulty":"beginner"},{"question":"Which of the following statements about Merge Sort is TRUE?","answers":{"a":"It is an in-place sorting algorithm","b":"Its performance depends on input order","c":"It uses extra memory for merging","d":"It has a worst-case time complexity of O(n²)"},"explanations":{"a":"Merge Sort requires additional memory.","b":"Merge Sort performance is independent of input order.","c":"Extra memory is used to merge subarrays.","d":"Its worst-case time complexity is O(n log n)."},"correctAnswer":"c","difficulty":"beginner"},{"question":"In Quick Sort, what is the role of the pivot element?","answers":{"a":"It stores the final sorted array","b":"It divides the array into two subarrays based on comparison","c":"It determines the size of the input array","d":"It is always the smallest element"},"explanations":{"a":"The pivot does not store the sorted array.","b":"The pivot partitions the array into elements smaller and larger than itself.","c":"Array size is independent of the pivot.","d":"The pivot can be any element depending on selection strategy."},"correctAnswer":"b","difficulty":"beginner"}];
+              const myQuestions = [{"question":"Which of the following best describes the divide and conquer technique?","answers":{"a":"Solving a problem by trying all possible solutions","b":"Dividing a problem into smaller sub-problems, solving them, and combining the results","c":"Solving a problem iteratively using loops","d":"Sorting elements by comparing adjacent values"},"explanations":{"a":"This describes brute-force techniques, not divide and conquer.","b":"Divide and conquer works by breaking a problem into smaller parts, solving them recursively, and combining results.","c":"Iterative approaches use loops rather than recursion.","d":"This describes bubble sort, not the divide and conquer paradigm."},"correctAnswer":"b","difficulty":"beginner"},{"question":"What is the primary reason for using sorting algorithms in computer science?","answers":{"a":"To reduce memory usage","b":"To improve data security","c":"To organize data for efficient searching and processing","d":"To increase program length"},"explanations":{"a":"Sorting may increase memory usage depending on the algorithm.","b":"Sorting does not directly improve security.","c":"Sorted data allows faster searching and easier data processing.","d":"Program length is unrelated to sorting."},"correctAnswer":"c","difficulty":"beginner"},{"question":"What is the time complexity of Merge Sort in the worst case?","answers":{"a":"O(n)","b":"O(n log n)","c":"O(n²)","d":"O(log n)"},"explanations":{"a":"Merge Sort always processes all elements at each level.","b":"Merge Sort divides the array log n times and merges n elements at each level.","c":"Quadratic time is typical of simple sorts like bubble sort.","d":"Logarithmic time alone is insufficient to process all elements."},"correctAnswer":"b","difficulty":"beginner"},{"question":"Which of the following is a common application of sorting algorithms?","answers":{"a":"Encrypting data","b":"Searching data efficiently","c":"Compressing files","d":"Generating random numbers"},"explanations":{"a":"Encryption is related to security, not sorting.","b":"Sorting helps improve the efficiency of searching algorithms like binary search.","c":"File compression does not rely on sorting.","d":"Random number generation does not require sorted data."},"correctAnswer":"b","difficulty":"beginner"},{"question":"In Quick Sort, what is the role of the pivot element?","answers":{"a":"It stores the final sorted array","b":"It divides the array into two subarrays based on comparison","c":"It determines the size of the input array","d":"It is always the smallest element"},"explanations":{"a":"The pivot does not store the sorted array.","b":"The pivot partitions the array into elements smaller and larger than itself.","c":"Array size is independent of the pivot.","d":"The pivot can be any element depending on selection strategy."},"correctAnswer":"b","difficulty":"beginner"}];
             </script>
               <script src="./assets/js/assessment_v2.js"></script>  
           <div class="bug-report-mobile">

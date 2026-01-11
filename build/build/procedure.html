@@ -190,6 +190,18 @@
                               </div>
                               <div>
                                   <div class="d-flex nav-menu-body">
+                                      <a href="contributors.html" class="p-2 ">
+                                      Contributors
+                                      </a>
+                                      
+                                  </div>
+                                  <div id="t-" class="collapse">
+                                      <div class="px-3 d-flex flex-column tasks align-items-center align-items-lg-start">
+                                      </div>
+                                  </div>
+                              </div>
+                              <div>
+                                  <div class="d-flex nav-menu-body">
                                       <a href="feedback.html" class="p-2 ">
                                       Feedback
                                       </a>
@@ -291,6 +303,18 @@
                 </div>
                 <div>
                     <div class="d-flex nav-menu-body">
+                        <a href="contributors.html" class="p-2 ">
+                        Contributors
+                        </a>
+                        
+                    </div>
+                    <div id="t-" class="collapse">
+                        <div class="px-3 d-flex flex-column tasks align-items-center align-items-lg-start">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex nav-menu-body">
                         <a href="feedback.html" class="p-2 ">
                         Feedback
                         </a>
@@ -306,49 +330,82 @@
               <h2 id="divide-and-conquer-strategies-i--sorting">Divide and Conquer Strategies I : Sorting</h2>
           
             </div>
-              <h3 id="procedure">Procedure</h3>
-          <h4 id="31-user-input">3.1 User Input:</h4>
+              <h3 id="user-input">User Input</h3>
           <ol>
-          <li>Select the desired sorting algorithm from the dropdown menu:
-           Merge Sort
-           Quick Sort </li>
-          <li>Adjust the value of N (number of elements in the array) using the slider provided.</li>
-          <li>Select the type of input array from the dropdown menu:
-           Randomly generated array
-           Already sorted array (ascending order)
-           Already sorted array (descending order)</li>
-          <li>Click the “Run Simulation” button to generate the input array and initialize the    selected sorting algorithm.</li>
+          <li><p>Select the desired sorting algorithm from the dropdown menu:</p>
+          <ul>
+          <li>Merge Sort</li>
+          <li>Quick Sort </li>
+          </ul>
+          </li>
+          <li><p>Adjust the value of <strong>N</strong> (number of elements in the array) using the slider provided.</p>
+          </li>
+          <li><p>Select the type of input array from the dropdown menu:</p>
+          <ul>
+          <li>Randomly generated array</li>
+          <li>Already sorted array (ascending order)</li>
+          <li>Already sorted array (descending order)</li>
+          </ul>
+          </li>
+          <li><p>Click the <strong>Run Simulation</strong> button to generate the input array and initialize the selected sorting algorithm.</p>
+          </li>
           </ol>
-          <h4 id="32-calculations--simulation-steps">3.2 Calculations / Simulation Steps</h4>
+          <hr>
+          <h3 id="calculations--simulation-steps">Calculations / Simulation Steps</h3>
           <ol>
-          <li>Click the “Next” button to execute the sorting algorithm step-by-step.</li>
-          <li>Observe the comparison, movement, and placement of elements at each step of the algorithm.</li>
-          <li>During Merge Sort execution, observe the following:
-          Recursive splitting of the array into smaller subarrays
-          Merging of subarrays in sorted order by comparing elements</li>
-          <li>During Quick Sort (Median of Three) execution, observe the following:</li>
-          <li>Selection of pivot using the Median-of-Three method
-           Movement of pointer P from left to right
-           Movement of pointer Q from right to left</li>
-          <li>Swapping of elements when pointers identify misplaced values</li>
+          <li><p>Click the <strong>Next</strong> button to execute the sorting algorithm step-by-step.</p>
+          </li>
+          <li><p>Observe the comparison, movement, and placement of elements at each step of the algorithm.</p>
+          </li>
+          <li><p>During <strong>Merge Sort</strong> execution, observe the following:</p>
+          <ul>
+          <li>Recursive splitting of the array into smaller subarrays</li>
+          <li>Merging of subarrays in sorted order based on element comparison</li>
+          </ul>
+          </li>
+          <li><p>During <strong>Quick Sort (Median-of-Three)</strong> execution, observe the following:</p>
+          <ul>
+          <li>Selection of the pivot using the Median-of-Three method</li>
+          <li>Movement of pointer <strong>i</strong> from left to right</li>
+          <li>Movement of pointer <strong>j</strong> from right to left</li>
+          <li>Swapping of elements when misplaced values are detected</li>
           <li>Placement of the pivot element at its correct sorted position after pointer crossing</li>
-          <li>Click the “Previous” button to revisit earlier steps and analyze the algorithm’s behavior in detail.</li>
-          <li>Click the “Auto-Run” button to automatically execute all remaining steps until the sorting process is completed.</li>
+          </ul>
+          </li>
+          <li><p>Click the <strong>Previous</strong> button to revisit earlier steps and analyze the algorithm’s behavior in detail.</p>
+          </li>
+          <li><p>Click the <strong>Auto-Run</strong> button to automatically execute all remaining steps until the sorting process is completed.</p>
+          </li>
           </ol>
-          <h3 id="33-results">3.3 Results</h3>
+          <hr>
+          <h3 id="scalability-analysis-graph-visualization">Scalability Analysis (Graph Visualization)</h3>
           <ol>
-          <li>Observe the Final Sorted Array displayed in the result section after completion of the simulation.</li>
-          <li>Analyze the Step Log, which records every operation performed by the algorithm along with the corresponding array state.</li>
-          <li>Observe and compare the following parameters:
-           Number of comparisons performed
-           Number of swaps made
-           Recursive behavior of the algorithms
-           Performance on different input arrangements</li>
-          <li>Study the Facts &amp; Analysis section to understand:
-           Time complexity of the algorithms
-           Space complexity of the algorithms
-           Advantages of Median-of-Three pivot selection in Quick Sort
-           Key differences between Merge Sort and Quick Sort</li>
+          <li><p>After completing the simulation, click the <strong>Scalability Graph</strong> option.</p>
+          </li>
+          <li><p>Select the maximum input size <strong>N</strong> from the dropdown menu.</p>
+          </li>
+          <li><p>The system automatically generates multiple input sizes up to the selected <strong>N</strong> and measures the execution time for each.</p>
+          </li>
+          <li><p>Observe the plotted graph of <strong>Input Size (n)</strong> versus <strong>Execution Time (ms)</strong>.</p>
+          </li>
+          <li><p>Analyze how the execution time increases with respect to input size for the selected algorithm.</p>
+          </li>
+          </ol>
+          <hr>
+          <h3 id="results">Results</h3>
+          <ol>
+          <li><p>Observe the <strong>final sorted array</strong> displayed after completion of the simulation.</p>
+          </li>
+          <li><p>Analyze the <strong>Step Log</strong>, which records each operation performed by the algorithm along with the corresponding array state.</p>
+          </li>
+          <li><p>Study the <strong>Scalability Graph analysis</strong>, which highlights:</p>
+          <ul>
+          <li>Growth of execution time with increasing input size</li>
+          <li>Average-case behavior of Quick Sort (O(n log n))</li>
+          <li>Consistent performance of Merge Sort (O(n log n))</li>
+          <li>Practical differences in scalability between the two algorithms</li>
+          </ul>
+          </li>
           </ol>
           
           </div>

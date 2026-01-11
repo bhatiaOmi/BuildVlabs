@@ -10,7 +10,7 @@
         "d": "Insertion Sort"
       },
       "explanations": {
-        "a": "Quick Sort division depends on pivot selection.",
+        "a": "Quick Sort division depends on pivot selection and may be unbalanced.",
         "b": "Merge Sort always splits the array into two equal or nearly equal halves.",
         "c": "Bubble Sort does not divide the array.",
         "d": "Insertion Sort processes elements sequentially."
@@ -44,10 +44,10 @@
         "d": "Random three elements"
       },
       "explanations": {
-        "a": "Only one of these represents a good pivot selection strategy.",
+        "a": "The second element is not part of the Median-of-Three method.",
         "b": "Median of first, middle, and last helps avoid worst-case partitions.",
         "c": "The algorithm does not choose three middle elements.",
-        "d": "Median of three is deterministic, not random."
+        "d": "Median-of-Three is deterministic, not random."
       },
       "correctAnswer": "b",
       "difficulty": "beginner"
@@ -61,27 +61,27 @@
         "d": "It removes recursion"
       },
       "explanations": {
-        "a": "Recursion depth may reduce indirectly but this is not the main reason.",
-        "b": "Choosing a balanced pivot avoids highly unbalanced partitions.",
-        "c": "Swapping is still required.",
+        "a": "Reduced recursion depth is a result, not the main goal.",
+        "b": "Balanced pivot selection prevents highly unbalanced partitions.",
+        "c": "Swapping is still required in Quick Sort.",
         "d": "Quick Sort always uses recursion."
       },
       "correctAnswer": "b",
       "difficulty": "beginner"
     },
     {
-      "question": "After completing the simulation, what can be concluded about Merge Sort and Quick Sort?",
+      "question": "In the Median-of-Three technique, once arr[left] ≤ arr[center] ≤ arr[right] is ensured, where is the median element usually moved in the array?",
       "answers": {
-        "a": "Both always perform in O(n²) time",
-        "b": "Merge Sort is in-place and Quick Sort uses extra memory",
-        "c": "Merge Sort has consistent performance, while Quick Sort depends on pivot selection",
-        "d": "Quick Sort cannot sort large arrays"
+        "a": "At the first index (left)",
+        "b": "At the middle index",
+        "c": "At the second last index (right − 1)",
+        "d": "At the last index (right)"
       },
       "explanations": {
-        "a": "Both algorithms are more efficient than O(n²) in most cases.",
-        "b": "Merge Sort uses extra memory, not Quick Sort.",
-        "c": "Merge Sort performance is consistent, while Quick Sort varies with pivot choice.",
-        "d": "Quick Sort can efficiently sort large arrays."
+        "a": "The first index is not used as the pivot position.",
+        "b": "The median is not kept in the middle for partitioning.",
+        "c": "The median is moved to right − 1 to act as the pivot during partitioning.",
+        "d": "The last index is reserved as a boundary element."
       },
       "correctAnswer": "c",
       "difficulty": "beginner"
