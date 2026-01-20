@@ -1,1 +1,1 @@
-## Divide and Conquer Strategies I : Sorting 
+## Divide & Conquer Strategies I: Sorting (MergeSort & QuickSort)

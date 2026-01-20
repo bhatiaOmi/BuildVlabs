@@ -1,7 +1,7 @@
 
 c:\Users\omika\OneDrive\Desktop\VLab_Experiment_3\ph3-exp-template\experiment\simulation\js\main.js
-   73:10  warning  'escapeHtml' is defined but never used  no-unused-vars
-  420:12  warning  Unexpected constant condition           no-constant-condition
+   87:10  warning  'escapeHtml' is defined but never used  no-unused-vars
+  469:12  warning  Unexpected constant condition           no-constant-condition
 
 ✖ 2 problems (0 errors, 2 warnings)
 
