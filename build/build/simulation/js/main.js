@@ -225,7 +225,7 @@ speedButtons.forEach(btn => {
 });
 
 function startAutoRun() {
-  autoRunBtn.textContent = '⏸️ Pause';
+  autoRunBtn.textContent = ' Pause ';
   autoRunBtn.classList.remove('primary');
   autoRunBtn.classList.add('danger');
 
@@ -243,7 +243,7 @@ function stopAutoRun() {
   clearInterval(autoRunInterval);
   autoRunInterval = null;
 
-  autoRunBtn.textContent = '▶️ Auto Run';
+  autoRunBtn.textContent = ' Auto Run';
   autoRunBtn.classList.remove('danger');
   autoRunBtn.classList.add('primary');
 }
@@ -636,7 +636,7 @@ function resetAll() {
   if (autoRunInterval) {
     clearInterval(autoRunInterval);
     autoRunInterval = null;
-    autoRunBtn.textContent = '▶️ Auto Run';
+    autoRunBtn.textContent = ' Auto Run ';
     autoRunBtn.classList.remove('danger');
     autoRunBtn.classList.add('primary');
   }
