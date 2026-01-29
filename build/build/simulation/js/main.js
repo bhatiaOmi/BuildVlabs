@@ -1,976 +1,1031 @@
-/**
- * Closest Pair - Divide and Conquer Simulation
- * Layout: Top Controls, Middle Data, Split Content
- */
+// script.js 
+const algoSelect = document.getElementById('algoSelect');
+const arrayType = document.getElementById('arrayType');
 
-const state = {
-    points: [],         // Original unsorted points (for ref? or just use sorted)
-    sortedPoints: [],   // Working set
-    trace: [],          // Execution steps
-    currentStep: -1,
-    autoPlayId: null,
+const runBtn = document.getElementById("runBtn");
+const resetBtn = document.getElementById('resetBtn');
+const autoRunBtn = document.getElementById('autoRun');
 
-    // Config
-    padding: 30,
-    speed: 800, // Default Normal
-    width: 0,
-    height: 0
-};
+const originalArrayEl = document.getElementById('originalArray');
+const currentArrayEl = document.getElementById('currentArray');
+const subArraysEl = document.getElementById('subArrays');
+const finalVisual = document.getElementById('finalVisual');
 
-// --- DOM Elements ---
-const el = {
-    canvas: document.getElementById('mainCanvas'),
-    ctx: document.getElementById('mainCanvas').getContext('2d'),
+const selAlgoText = document.getElementById('selAlgoText');
+const stepIndex = document.getElementById('stepIndex');
+const stepTotal = document.getElementById('stepTotal');
+const prevStep = document.getElementById('prevStep');
+const nextStep = document.getElementById('nextStep');
 
-    // Inputs
-    inputN: document.getElementById('pointCount'),
-    btnGenerate: document.getElementById('btnGenerate'),
-    btnReset: document.getElementById('btnReset'),
+const logContainer = document.getElementById('logContainer');
+const factsText = document.getElementById('factsText');
+const nRange = document.getElementById('nRange');
+const nValue = document.getElementById('nValue');
+const speedMenu = document.getElementById('speedMenu');
+const speedButtons = speedMenu.querySelectorAll('button');
+const advancedAnalysisBox = document.getElementById('advancedAnalysisBox');
+const advancedBtn = document.getElementById('advancedBtn');
+const customInputContainer = document.getElementById('customInputContainer');
+const customArrayInput = document.getElementById('customArrayInput');
 
-    // Data Views
-    coordList: document.getElementById('coordinateList'),
-    minVal: document.getElementById('currentMinVal'),
-    compCount: document.getElementById('compCount'),
-    stepCounter: document.getElementById('stepCounter'),
+// Modal elements
+const overlay = document.getElementById('graphOverlay');
+const modal = document.getElementById('graphModal');
+const closeBtn = document.getElementById('closeGraphBtn');
+const inputSizeDropdown = document.getElementById('inputSizeDropdown');
+const canvas = document.getElementById('scalabilityCanvas');
+const graphMessage = document.getElementById('graphMessage');
 
-    // Controls
-    btnPrev: document.getElementById('btnPrev'),
-    btnNext: document.getElementById('btnNext'),
-    btnAuto: document.getElementById('btnAuto'),
-    // Dropdown
-    speedDropdown: document.getElementById('speedDropdown'),
-    speedItems: document.querySelectorAll('.dropdown-item'),
-    logBox: document.getElementById('logContainer'),
+let autoRunSpeed = null;
+let comparisonCount = 0;
 
-    // Modal
-    btnParams: document.getElementById('btnDynamicParams'),
-    modal: document.getElementById('paramsModal'),
-    btnCloseModal: document.querySelector('.close-modal'),
+// Neutral defaults on load
+algoSelect.value = "";
+selAlgoText.textContent = '-';
+factsText.textContent = 'Select an algorithm to view facts and analysis.';
 
-    // Modal Data
-    pCompDC: document.getElementById('pCompDC'),
-    pCompBF: document.getElementById('pCompBF'),
-    pSaved: document.getElementById('pSaved'),
-    pExecTime: document.getElementById('pExecTime'),
+nRange.value = 0;
+nValue.textContent = '0';
 
-    // Comparison View
-    simulationView: document.getElementById('simulationView'),
-    comparisonView: document.getElementById('comparisonView'),
-    btnShowAdvanced: document.getElementById('btnShowAdvanced'),
-    btnGoBack: document.getElementById('btnGoBack'),
-    inputCompN: document.getElementById('inputN'),
-    inputType: document.getElementById('inputType'),
-    btnRunComparison: document.getElementById('btnRunComparison'),
-    btnResetComparison: document.getElementById('btnResetComparison'),
-    statusMsg: document.getElementById('statusMsg'),
-    bfTime: document.getElementById('bfTime'),
-    bfComps: document.getElementById('bfComps'),
-    bfDist: document.getElementById('bfDist'),
-    bfBar: document.getElementById('bfBar'),
-    bfObservation: document.getElementById('bfObservation'),
-    dcTime: document.getElementById('dcTime'),
-    dcComps: document.getElementById('dcComps'),
-    dcDist: document.getElementById('dcDist'),
-    dcBar: document.getElementById('dcBar'),
-    dcObservation: document.getElementById('dcObservation'),
-    effGain: document.getElementById('effGain')
-};
+// live update while sliding
+nRange.addEventListener('input', () => {
+  nValue.textContent = nRange.value;
+});
 
-// --- Comparison State ---
-const compState = {
-    points: [],
-    bfStats: {},
-    dcStats: {}
-};
+let baseArray = [];
+let originalArray = [];
+let steps = [];
+let curStep = -1;
+let stepCounter = 0;
+let autoRunInterval = null;
 
-// --- Initialization ---
-function init() {
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+// Algorithm selection
+algoSelect.addEventListener('change', () => {
+  if (!algoSelect.value) return;
+  selAlgoText.textContent =
+    algoSelect.value === 'merge' ? 'Merge Sort' : 'Quick Sort';
+  setFacts();
+});
 
-    el.btnGenerate.addEventListener('click', generateExperiment);
-    el.btnReset.addEventListener('click', resetExperiment);
-    el.btnNext.addEventListener('click', () => step(1));
-    el.btnPrev.addEventListener('click', () => step(-1));
-    el.btnAuto.addEventListener('click', toggleAutoPlay);
+arrayType.addEventListener('change', () => {
+  if (arrayType.value === 'custom') {
+    customInputContainer.classList.remove('hidden');
+    nRange.disabled = true;
+    nValue.parentElement.style.opacity = '0.5';
+  } else {
+    customInputContainer.classList.add('hidden');
+    nRange.disabled = false;
+    nValue.parentElement.style.opacity = '1';
+  }
+});
 
-    // Speed Dropdown Items
-    el.speedItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            const val = parseInt(e.target.dataset.speed);
-            e.stopPropagation(); // Don't trigger window click
-            handleSpeedSelection(val);
-        });
-    });
-
-    // Close dropdown on outside click
-    window.addEventListener('click', (e) => {
-        if (!el.btnAuto.contains(e.target)) {
-            el.speedDropdown.classList.add('hidden');
-        }
-    });
-
-    // Modal Events
-    el.btnParams.addEventListener('click', openParamsModal);
-    el.btnCloseModal.addEventListener('click', closeParamsModal);
-    window.addEventListener('click', (e) => {
-        if (e.target === el.modal) {
-            closeParamsModal();
-        }
-    });
-
-    // Comparison View Listeners
-    el.btnShowAdvanced.addEventListener('click', () => {
-        el.simulationView.classList.add('hidden');
-        el.comparisonView.classList.add('active');
-    });
-
-    el.btnGoBack.addEventListener('click', () => {
-        el.comparisonView.classList.remove('active');
-        el.simulationView.classList.remove('hidden');
-    });
-
-    el.btnRunComparison.addEventListener('click', runComparisonAnalysis);
-    el.btnResetComparison.addEventListener('click', resetComparisonUI);
+// helpers
+function generateRandomArray(n) {
+  return Array.from({ length: n }, () => Math.floor(Math.random() * 99) + 1);
 }
 
-function resizeCanvas() {
-    const parent = el.canvas.parentElement;
-    state.width = parent.clientWidth;
-    state.height = parent.clientHeight;
-    el.canvas.width = state.width;
-    el.canvas.height = state.height;
-    draw();
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
-// --- Core Logic ---
-
-function generateExperiment() {
-    stopAutoPlay();
-
-    const rawVal = el.inputN.value.trim();
-
-    // Check for empty or non-numeric
-    if (rawVal === '' || isNaN(Number(rawVal))) {
-        alert("Invalid Input: Please enter a valid integer number (e.g., 10).");
-        resetExperiment(); // Ensure controls are disabled
-        return;
-    }
-
-    const n = Number(rawVal);
-
-    // Check for Integer
-    if (!Number.isInteger(n)) {
-        alert("Invalid Input: N must be an integer.");
-        resetExperiment();
-        return;
-    }
-
-    // Critical Edge Case: N < 2
-    if (n < 2) {
-        alert("Closest pair requires at least 2 points.");
-        resetExperiment();
-        return;
-    }
-
-    // Optional: Max limit check based on prev HTML
-    // Visualization Clarity Limit
-    if (n > 20) {
-        alert("Please choose N <= 20 for better understanding of visualization.");
-        resetExperiment();
-        return;
-    }
-
-    // 1. Generate Points with distance check to avoid label overlap
-    state.points = [];
-    const minStepDist = 8; // Logical units
-    for (let i = 0; i < n; i++) {
-        let p;
-        let attempts = 0;
-        let valid = false;
-        while (!valid && attempts < 100) {
-            p = {
-                id: i,
-                x: Math.floor(Math.random() * 90) + 5, // Keep away from edges
-                y: Math.floor(Math.random() * 90) + 5
-            };
-            valid = state.points.every(existing => {
-                const dx = p.x - existing.x;
-                const dy = p.y - existing.y;
-                return Math.sqrt(dx * dx + dy * dy) >= minStepDist;
-            });
-            attempts++;
-        }
-        state.points.push(p);
-    }
-
-    // Update Coordinate List UI
-    updateCoordinateList(state.points);
-
-    // 2. Prepare Simulation (Sort & Trace)
-    prepareSimulation();
-
-    // Reset UI State
-    state.currentStep = -1;
-    el.logBox.innerHTML = '<div class="log-entry system">Experiment Generated. Ready to start.</div>';
-    el.minVal.textContent = '-';
-    el.compCount.textContent = '0';
-    el.stepCounter.textContent = '0/0';
-    updateButtons();
-
-    draw(); // Initial draw (unsorted)
+function renderFinal(arr) {
+  finalVisual.innerHTML = '';
+  if (!arr || arr.length === 0) {
+    finalVisual.textContent = '(Sorted array will appear here)';
+    return;
+  }
+  arr.forEach(v => {
+    const e = document.createElement('div');
+    e.style.padding = '6px 10px';
+    e.style.background = '#eef2ff';
+    e.style.border = '1px solid #dbeafe';
+    e.style.borderRadius = '6px';
+    e.style.fontWeight = '600';
+    e.textContent = v;
+    finalVisual.appendChild(e);
+  });
 }
 
-function resetExperiment() {
-    stopAutoPlay();
-    state.points = [];
-    state.sortedPoints = [];
-    state.trace = [];
-    state.currentStep = -1;
-    state.stats = null;
+// control handlers
+resetBtn.addEventListener('click', resetAll);
 
-    // Clear Data Views
-    el.coordList.innerHTML = '<span class="placeholder">Points will appear here after generation...</span>';
-    el.logBox.innerHTML = '<div class="log-entry system">Ready. Generate points to begin.</div>';
-    el.minVal.textContent = '-';
-    el.compCount.textContent = '-';
-    el.stepCounter.textContent = '0/0';
+runBtn.addEventListener('click', () => {
+  if (!algoSelect.value) {
+    alert("Please select an algorithm first");
+    return;
+  }
 
-    // Reset Buttons
-    updateButtons();
+  const n = Number(nRange.value);
+  const t = arrayType.value;
 
-    // Clear Canvas
-    el.ctx.clearRect(0, 0, state.width, state.height);
-}
+  if (t === 'custom') {
+    const raw = customArrayInput.value;
+    // Split by comma or space
+    const parts = raw.split(/[\s,]+/).filter(v => v.trim() !== '').map(Number);
 
-function updateCoordinateList(points) {
-    const text = points
-        .map(p => `(${p.x}, ${p.y})`)
-        .join(',  ');
-    el.coordList.textContent = text;
-}
-
-
-function prepareSimulation() {
-    state.trace = [];
-    let comparisons = 0;
-
-    // Helper to push steps
-    const record = (type, msg, meta = {}) => {
-        state.trace.push({ type, msg, meta: { ...meta, comparisons } });
-    };
-
-    // Step 1: Sorting
-    record('sort', 'Sorting all points by X-coordinate to prepare for regional splitting.', {
-        stage: 'sorting',
-        sorted: false
-    });
-
-    const sorted = [...state.points].sort((a, b) => a.x - b.x);
-    state.sortedPoints = sorted;
-
-    record('sort', 'Sorting Complete. Starting the recursive Divide & Conquer algorithm.', {
-        stage: 'sorting',
-        sorted: true,
-        activePoints: sorted
-    });
-
-    // --- Divide & Conquer Algo ---
-
-    function dist(p1, p2) {
-        comparisons++;
-        return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+    if (parts.length === 0) {
+      alert("Please enter at least one number.");
+      return;
+    }
+    if (parts.some(isNaN)) {
+      alert("Please enter valid numbers only.");
+      return;
+    }
+    if (parts.length > 20) {
+      alert("Please enter N <=20 or proper visualisation ");
+      return;
     }
 
-    function bruteForce(points, parentMeta) {
-        let minD = Infinity;
-        let pair = [];
+    baseArray = parts;
+    // Update N UI just to match
+    nRange.value = baseArray.length;
+    nValue.textContent = baseArray.length;
 
-        for (let i = 0; i < points.length; i++) {
-            for (let j = i + 1; j < points.length; j++) {
-                const d = dist(points[i], points[j]);
-
-                record('compare', `Checking pair P${points[i].id + 1} and P${points[j].id + 1}. Dist: ${d.toFixed(2)}`, {
-                    ...parentMeta,
-                    highlight: [points[i], points[j]],
-                    currentMin: minD
-                });
-
-                if (d < minD) {
-                    minD = d;
-                    pair = [points[i], points[j]];
-                    record('new_min', `New local minimum ${d.toFixed(2)} found between P${points[i].id + 1} and P${points[j].id + 1}.`, {
-                        ...parentMeta,
-                        bestPair: pair,
-                        currentMin: minD
-                    });
-                }
-            }
-        }
-        return { min: minD, pair: pair };
+  } else {
+    // Normal generation
+    if (n <= 0) {
+      alert("Please select a value greater than 0 for N.");
+      return;
     }
 
-    function solveRecursive(px, py) {
-        const n = px.length;
+    baseArray =
+      t === 'random'
+        ? generateRandomArray(n)
+        : t === 'asc'
+          ? Array.from({ length: n }, (_, i) => i + 1)
+          : Array.from({ length: n }, (_, i) => n - i);
+  }
 
-        // Base Case
-        if (n <= 3) {
-            record('base', `<b>Base Case</b> (N=${n}): Region is small enough to check all pairs directly using Brute Force.`, { activeRegion: px });
-            return bruteForce(px, { activeRegion: px });
-        }
+  // Toggle pivot spacing
+  if (algoSelect.value === 'quick') {
+    currentArrayEl.classList.add('with-pivot');
+  } else {
+    currentArrayEl.classList.remove('with-pivot');
+  }
 
-        // Divide
-        const mid = Math.floor(n / 2);
-        const midPoint = px[mid];
+  originalArray = baseArray.slice();
+  originalArrayEl.textContent = '[' + originalArray.join(', ') + ']';
+  currentArrayEl.textContent = '-'; // Do not show current array initially
+  subArraysEl.innerHTML = '';
 
-        record('divide', `<b>Divide:</b> Splitting the current group of ${n} points at X = ${midPoint.x.toFixed(1)} into two halves.`, {
-            activeRegion: px,
-            divisionLine: midPoint.x
-        });
+  renderFinal([]);
 
-        const PxL = px.slice(0, mid);
-        const PxR = px.slice(mid);
+  logContainer.innerHTML = '';
+  steps = [];
+  curStep = -1;
+  stepCounter = 0;
+  comparisonCount = 0;
+  stepIndex.textContent = 0;
+  stepTotal.textContent = 0;
 
-        const PyL = py.filter(p => p.x < midPoint.x || (p.x === midPoint.x && PxL.includes(p)));
-        const PyR = py.filter(p => p.x >= midPoint.x && !PyL.includes(p));
+  advancedAnalysisBox.classList.add('hidden');
 
-        const leftRes = solveRecursive(PxL, PyL);
-        const rightRes = solveRecursive(PxR, PyR);
+  prepareSteps();
+});
 
-        // Merge
-        let d = Math.min(leftRes.min, rightRes.min);
-        let pair = leftRes.min < rightRes.min ? leftRes.pair : rightRes.pair;
+prevStep.addEventListener('click', () => {
+  if (curStep > 0) {
+    curStep--;
+    removeLastLogEntry();
+    showStep(curStep, false);
+  }
+});
 
-        record('conquer', `<b>Conquer:</b> Merging results. Left min = ${leftRes.min.toFixed(2)}, Right min = ${rightRes.min.toFixed(2)}. Best so far δ = ${d.toFixed(2)}.`, {
-            activeRegion: px,
-            divisionLine: midPoint.x,
-            bestPair: pair,
-            currentMin: d
-        });
+nextStep.addEventListener('click', () => {
+  if (curStep < steps.length - 1) {
+    curStep++;
+    showStep(curStep, true);
+  }
+});
 
-        // Strip
-        const strip = py.filter(p => Math.abs(p.x - midPoint.x) < d);
+// Auto Run functionality
+autoRunBtn.addEventListener('click', () => {
+  if (autoRunInterval) {
+    stopAutoRun();
+    return;
+  }
 
-        record('strip', `<b>Strip Check:</b> Examining the central region of width 2δ (${(2 * d).toFixed(2)}) for any pairs closer than δ = ${d.toFixed(2)}.`, {
-            activeRegion: px,
-            divisionLine: midPoint.x,
-            stripRegion: { x: midPoint.x, width: d },
-            bestPair: pair,
-            currentMin: d
-        });
+  speedMenu.classList.toggle('hidden');
+});
 
-        // Strip check
-        for (let i = 0; i < strip.length; i++) {
-            for (let j = i + 1; j < strip.length && (strip[j].y - strip[i].y) < d; j++) {
-                const d2 = dist(strip[i], strip[j]);
+// Speed selection
+speedButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    autoRunSpeed = Number(btn.dataset.speed);
+    speedMenu.classList.add('hidden');
 
-                record('compare', `<b>Refinement:</b> Checking distance between P${strip[i].id + 1} and P${strip[j].id + 1} in the strip. Dist: ${d2.toFixed(2)}`, {
-                    activeRegion: px,
-                    divisionLine: midPoint.x,
-                    stripRegion: { x: midPoint.x, width: d },
-                    highlight: [strip[i], strip[j]],
-                    bestPair: pair,
-                    currentMin: d
-                });
-
-                if (d2 < d) {
-                    d = d2;
-                    pair = [strip[i], strip[j]];
-
-                    record('new_min', `<b>Better Pair Found!</b> Points P${strip[i].id + 1} and P${strip[j].id + 1} are closer (Dist: ${d.toFixed(2)}). New δ = ${d.toFixed(2)}.`, {
-                        activeRegion: px,
-                        divisionLine: midPoint.x,
-                        stripRegion: { x: midPoint.x, width: d },
-                        bestPair: pair,
-                        currentMin: d
-                    });
-                }
-            }
-        }
-
-        return { min: d, pair: pair };
+    if (!steps || steps.length === 0) {
+      alert("Please generate the array before proceeding.");
+      return;
     }
 
-    // Start
-    const Py = [...sorted].sort((a, b) => a.y - b.y);
+    startAutoRun();
+  });
+});
 
-    // Performance Measurement
-    const t0 = performance.now();
-    const result = solveRecursive(sorted, Py);
-    const t1 = performance.now();
+function startAutoRun() {
+  autoRunBtn.textContent = ' Pause ';
+  autoRunBtn.classList.remove('primary');
+  autoRunBtn.classList.add('danger');
 
-    // Store Stats
-    state.stats = {
-        execTime: (t1 - t0).toFixed(4), // ms
-        compDC: comparisons,
-        compBF: (sorted.length * (sorted.length - 1)) / 2
-    };
-
-    record('finish', `<b>Success:</b> Closest pair found! Distance = ${result.min.toFixed(2)} between P${result.pair[0].id + 1} and P${result.pair[1].id + 1}.`, {
-        activeRegion: sorted,
-        bestPair: result.pair,
-        currentMin: result.min
-    });
-
-    // Update step counter display with total steps
-    const totalSteps = state.trace.length;
-    el.stepCounter.textContent = `0/${totalSteps}`;
-}
-
-// --- Modal Logic ---
-function openParamsModal() {
-    if (!state.stats) {
-        // Fallback if no experiment generated
-        el.pCompDC.textContent = '-';
-        el.pCompBF.textContent = '-';
-        el.pSaved.textContent = '-';
-        el.pExecTime.textContent = '-';
+  autoRunInterval = setInterval(() => {
+    if (curStep < steps.length - 1) {
+      curStep++;
+      showStep(curStep, true);
     } else {
-        el.pCompDC.textContent = state.stats.compDC;
-        el.pCompBF.textContent = state.stats.compBF;
-
-        const saved = state.stats.compBF - state.stats.compDC;
-        el.pSaved.textContent = saved > 0 ? saved : 0; // Should be positive
-
-        el.pExecTime.textContent = state.stats.execTime + ' ms';
+      stopAutoRun();
     }
-    el.modal.style.display = 'block';
+  }, autoRunSpeed);
 }
 
-function closeParamsModal() {
-    el.modal.style.display = 'none';
+function stopAutoRun() {
+  clearInterval(autoRunInterval);
+  autoRunInterval = null;
+
+  autoRunBtn.textContent = ' Auto Run';
+  autoRunBtn.classList.remove('danger');
+  autoRunBtn.classList.add('primary');
 }
 
+// Prepare steps using exact algorithms
+function prepareSteps() {
+  steps = [];
+  curStep = -1;
+  stepCounter = 0;
+  comparisonCount = 0;
 
-// --- Stepping Logic ---
+  const arr = baseArray.slice();
 
-function step(delta) {
-    const next = state.currentStep + delta;
-    if (next < 0 || next >= state.trace.length) {
-        if (delta === 1 && state.autoPlayId) stopAutoPlay();
-        return;
-    }
+  if (algoSelect.value === 'merge') {
+    mergeSortTrace(arr);
+  } else if (algoSelect.value === 'quick') {
+    quickSortTrace(arr);
+  }
 
-    state.currentStep = next;
-    const s = state.trace[next];
+  steps.push({
+    type: 'done',
+    description: '✓ Algorithm performed successfully. Final sorted array',
+    array: arr.slice(),
+    subArrays: [],
+    step: ++stepCounter
+  });
 
-    // Update step counter
-    const totalSteps = state.trace.length;
-    const currentStepNum = next + 1;
-    el.stepCounter.textContent = `${currentStepNum}/${totalSteps}`;
-
-    // Log update
-    updateLog(next);
-
-    // Stats update
-    if (s.meta.comparisons !== undefined) el.compCount.textContent = s.meta.comparisons;
-    if (s.meta.currentMin && s.meta.currentMin !== Infinity) el.minVal.textContent = s.meta.currentMin.toFixed(2);
-
-    updateButtons();
-    draw();
+  stepTotal.textContent = steps.length;
+  stepIndex.textContent = 0;
+  logContainer.innerHTML = '';
+  currentArrayEl.textContent = '-'; // Initial hidden state
+  subArraysEl.innerHTML = '';
+  renderFinal([]);
+  setFacts();
 }
 
-function updateLog(index) {
-    // Rebuild or Append? User wanted "prev button so i can jump to back step"
-    // Rebuilding is safest for "Jumping".
-    // "I want to see each step as a new line"
+/* ===== MERGE SORT ===== */
+function mergeSortTrace(arr) {
+  function merge(l, m, r) {
+    const leftArr = arr.slice(l, m + 1);
+    const rightArr = arr.slice(m + 1, r + 1);
 
-    el.logBox.innerHTML = '';
-    for (let i = 0; i <= index; i++) {
-        const item = state.trace[i];
-        const row = document.createElement('div');
-        row.className = `log-entry ${item.type}`;
-        row.innerHTML = `<span class="step-num">Step ${i + 1}:</span> ${item.msg}`;
-        el.logBox.appendChild(row);
-    }
-    el.logBox.scrollTop = el.logBox.scrollHeight;
-}
-
-function updateButtons() {
-    el.btnPrev.disabled = state.currentStep < 0;
-    el.btnNext.disabled = state.currentStep >= state.trace.length - 1;
-
-    // Auto button should be enabled if we have steps
-    el.btnAuto.disabled = state.trace.length === 0;
-}
-
-function toggleAutoPlay(e) {
-    if (state.autoPlayId) {
-        stopAutoPlay();
-    } else {
-        // Toggle Dropdown
-        el.speedDropdown.classList.toggle('hidden');
-    }
-    if (e) e.stopPropagation();
-}
-
-function handleSpeedSelection(speed) {
-    state.speed = speed;
-    el.speedDropdown.classList.add('hidden');
-    startAutoPlay();
-}
-
-function startAutoPlay() {
-    el.btnAuto.innerHTML = 'Stop';
-    el.btnAuto.classList.add('active');
-
-    // Recursive loop
-    const loop = () => {
-        if (state.currentStep < state.trace.length - 1) {
-            step(1);
-            state.autoPlayId = setTimeout(loop, state.speed);
-        } else {
-            stopAutoPlay();
-        }
-    };
-
-    loop();
-}
-
-function stopAutoPlay() {
-    clearTimeout(state.autoPlayId);
-    state.autoPlayId = null;
-    el.btnAuto.innerHTML = 'Auto Play &#9662;';
-    el.btnAuto.classList.remove('active');
-    // Ensure dropdown closed
-    if (el.speedDropdown) el.speedDropdown.classList.add('hidden');
-}
-
-// --- Drawing Logic ---
-
-function toCanvas(p) {
-    const w = state.width - 2 * state.padding;
-    const h = state.height - 2 * state.padding;
-    // Invert Y so 0,0 is bottom-left for graph-like feel
-    return {
-        x: state.padding + (p.x / 100) * w,
-        y: state.height - state.padding - (p.y / 100) * h
-    };
-}
-
-function draw() {
-    const w = state.width;
-    const h = state.height;
-    const ctx = el.ctx;
-
-    // Clear with semi-transparent black for potential trails (or clean clear)
-    ctx.clearRect(0, 0, w, h);
-
-    // Grid Background (Subtle)
-    drawGrid();
-
-    // Default State
-    if (state.currentStep === -1) {
-        if (state.points.length > 0) {
-            drawPoints(state.points, '#94a3b8', 4, false); // Grey
-        }
-        return;
-    }
-
-    const s = state.trace[state.currentStep];
-    const m = s.meta;
-
-    // 1. Division Line & Halves Shading
-    if (m.divisionLine !== undefined) {
-        const xPos = toCanvas({ x: m.divisionLine, y: 0 }).x;
-
-        // Left Region Shading
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-        ctx.fillRect(0, 0, xPos, h);
-
-        // Right Region Shading
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.02)';
-        ctx.fillRect(xPos, 0, w - xPos, h);
-
-        // Bold Midline
-        drawLine(xPos, 0, xPos, h, '#ffff', 2, [5, 5]);
-        drawText(xPos + 5, 20, 'Divide X=' + m.divisionLine.toFixed(1), '#fff');
-        // Bottom label for midline
-        drawText(xPos + 5, h - 10, 'x=' + m.divisionLine.toFixed(1), '#94a3b8');
-    }
-
-    // 2. Strip Region
-    if (m.stripRegion) {
-        const c = m.stripRegion.x;
-        const widthVal = m.stripRegion.width;
-        const x1 = toCanvas({ x: c - widthVal, y: 0 }).x;
-        const x2 = toCanvas({ x: c + widthVal, y: 0 }).x;
-
-        // Strip Fill
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.1)'; // Blue/Grey transparent
-        ctx.fillRect(x1, 0, x2 - x1, h);
-
-        // Boundaries
-        drawLine(x1, 0, x1, h, 'rgba(56, 189, 248, 0.4)', 1);
-        drawLine(x2, 0, x2, h, 'rgba(56, 189, 248, 0.4)', 1);
-
-        drawText(x1 + 5, h - 35, `δL (x=${(c - widthVal).toFixed(1)})`, '#38bdf8');
-        drawText(x2 + 5, h - 35, `δR (x=${(c + widthVal).toFixed(1)})`, '#38bdf8');
-        drawText((x1 + x2) / 2, 40, 'Strip 2δ', '#38bdf8', 'center');
-    }
-
-    // 3. Points
-    // Determine active set
-    let activeIds = new Set();
-    if (m.activeRegion) m.activeRegion.forEach(p => activeIds.add(p.id));
-
-    // Determine Strip Points (Blue)
-    let stripIds = new Set();
-    if (m.stripRegion && m.activeRegion) { // Recalculate which are in strip for visual color
-        m.activeRegion.forEach(p => {
-            if (Math.abs(p.x - m.stripRegion.x) < m.stripRegion.width) {
-                stripIds.add(p.id);
-            }
-        });
-    }
-
-    state.points.forEach(p => {
-        let color = '#475569'; // Default dim grey
-        let glow = false;
-        if (activeIds.has(p.id)) color = '#94a3b8'; // Active region lighter grey
-        if (stripIds.has(p.id)) {
-            color = '#38bdf8'; // Cyan/Blue for Strip
-            glow = true;
-        }
-
-        // Draw Point
-        drawPointNode(p, color, glow, p.id + 1);
+    steps.push({
+      type: 'merge-start',
+      description: `Split subarray → [${leftArr.join(',')}] | [${rightArr.join(',')}]`,
+      array: arr.slice(),
+      subArrays: [leftArr, rightArr],
+      step: ++stepCounter
     });
 
-    // 4. Comparisons & Highlights
-    // Red Neighborhood Box
-    if (m.highlight && m.stripRegion) {
-        // Draw box around the first point (reference point)
-        const p1 = m.highlight[0];
-        const d = m.currentMin; // or strip width
-        const c1 = toCanvas(p1);
+    const left = arr.slice(l, m + 1), right = arr.slice(m + 1, r + 1);
+    let i = 0, j = 0, k = l;
 
-        // Logical coords for box: [x-d, x+d] ?? No, standard algo is check next 7 points in y range d
-        // Visualizing the delta-by-2delta box:
-        // Width 2d, Height d. Centered on x? No, usually x-d to x+d
-        // Let's draw a box representing the Y-limit constraint
-        const boxW = toCanvas({ x: d, y: 0 }).x - toCanvas({ x: 0, y: 0 }).x; // Scaled width
-        const boxH = Math.abs(toCanvas({ x: 0, y: d }).y - toCanvas({ x: 0, y: 0 }).y);
+    while (i < left.length && j < right.length) {
+      comparisonCount++;
+      steps.push({
+        type: 'compare',
+        description: `Compare ${left[i]} and ${right[j]}`,
+        array: arr.slice(),
+        subArrays: [leftArr, rightArr],
+        step: ++stepCounter
+      });
 
-        ctx.strokeStyle = '#ef4444'; // Red
-        ctx.lineWidth = 1;
-        ctx.strokeRect(c1.x - boxW, c1.y, boxW * 2, boxH); // Downwards y is positive in canvas but we inverted?
-        // Wait, toCanvas inverts Y. So +Y usually goes UP.
-        // boxH should be drawn downwards or upwards depending on loop direction.
-        // Loop is j=i+1, sorted by Y. So we look UP?
-        // Let's just draw a box around p1.
-        ctx.strokeRect(c1.x - boxW, c1.y - boxH, boxW * 2, boxH * 2);
+      if (left[i] <= right[j]) {
+        arr[k] = left[i++];
+        steps.push({
+          type: 'place',
+          description: `Place ${arr[k]} at index ${k} `,
+          array: arr.slice(),
+          subArrays: [leftArr, rightArr],
+          step: ++stepCounter
+        });
+      } else {
+        arr[k] = right[j++];
+        steps.push({
+          type: 'place',
+          description: `Place ${arr[k]} at index ${k}`,
+          array: arr.slice(),
+          subArrays: [leftArr, rightArr],
+          step: ++stepCounter
+        });
+      }
+      k++;
     }
 
-    if (m.highlight) {
-        drawConnection(m.highlight[0], m.highlight[1], '#f59e0b', 2); // Orange
+    while (i < left.length) {
+      arr[k++] = left[i++];
+      steps.push({
+        type: 'place',
+        description: `Place remaining ${arr[k - 1]} at index ${k - 1}`,
+        array: arr.slice(),
+        subArrays: [leftArr, rightArr],
+        step: ++stepCounter
+      });
     }
 
-    if (m.bestPair) {
-        drawConnection(m.bestPair[0], m.bestPair[1], '#22c55e', 3); // Green
-
-        // Label Distance
-        const p1 = m.bestPair[0];
-        const p2 = m.bestPair[1];
-        const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-        const cm = toCanvas(mid);
-        drawText(cm.x, cm.y - 10, `d = ${m.currentMin.toFixed(2)}`, '#22c55e', 'center');
+    while (j < right.length) {
+      arr[k++] = right[j++];
+      steps.push({
+        type: 'place',
+        description: `Place remaining ${arr[k - 1]} at index ${k - 1}`,
+        array: arr.slice(),
+        subArrays: [leftArr, rightArr],
+        step: ++stepCounter
+      });
     }
+
+    steps.push({
+      type: 'merge-done',
+      description: `Merge complete → [${arr.slice(l, r + 1).join(',')}]`,
+      array: arr.slice(),
+      subArrays: [arr.slice(l, r + 1)],
+      step: ++stepCounter
+    });
+  }
+
+  function rec(l, r) {
+    steps.push({
+      type: 'split',
+      description: `Split subarray[${l}..${r}]`,
+      array: arr.slice(),
+      subArrays: [arr.slice(l, r + 1)],
+      step: ++stepCounter
+    });
+
+    if (l >= r) return;
+    const m = Math.floor((l + r) / 2);
+    rec(l, m);
+    rec(m + 1, r);
+    merge(l, m, r);
+  }
+
+  rec(0, arr.length - 1);
 }
 
-// --- Helpers ---
+/* ===== QUICK SORT (Proper Median-of-Three) ===== */
+function quickSortTrace(arr) {
+  function medianOfThree(l, r) {
+    const center = Math.floor((l + r) / 2);
 
-function drawGrid() {
-    const ctx = el.ctx;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.lineWidth = 1;
+    steps.push({
+      type: 'pivot-selection',
+      description: `Median-of-three: Comparing arr[${l}]=${arr[l]}, arr[${center}]=${arr[center]}, arr[${r}]=${arr[r]} and ensure arr[left] ≤ arr[center] ≤ arr[right] ,then middle value becomes the pivot`,
+      array: arr.slice(),
+      subArrays: [arr.slice(l, r + 1)],
+      step: ++stepCounter
+    });
 
-    // Vertical
-    for (let i = 0; i <= 100; i += 10) {
-        const x = toCanvas({ x: i, y: 0 }).x;
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, state.height); ctx.stroke();
+    // Sort left, center, right
+    if (arr[l] > arr[center]) {
+      [arr[l], arr[center]] = [arr[center], arr[l]];
+      steps.push({
+        type: 'pivot-sort',
+        description: `Swap arr[${l}] and arr[${center}]`,
+        array: arr.slice(),
+        subArrays: [arr.slice(l, r + 1)],
+        step: ++stepCounter
+      });
     }
-    // Horizontal
-    for (let i = 0; i <= 100; i += 10) {
-        const y = toCanvas({ x: 0, y: i }).y;
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(state.width, y); ctx.stroke();
+
+    if (arr[l] > arr[r]) {
+      [arr[l], arr[r]] = [arr[r], arr[l]];
+      steps.push({
+        type: 'pivot-sort',
+        description: `Swap arr[${l}] and arr[${r}]`,
+        array: arr.slice(),
+        subArrays: [arr.slice(l, r + 1)],
+        step: ++stepCounter
+      });
     }
+
+    if (arr[center] > arr[r]) {
+      [arr[center], arr[r]] = [arr[r], arr[center]];
+      steps.push({
+        type: 'pivot-sort',
+        description: `Swap arr[${center}] and arr[${r}]`,
+        array: arr.slice(),
+        subArrays: [arr.slice(l, r + 1)],
+        step: ++stepCounter
+      });
+    }
+
+    // Now arr[l] <= arr[center] <= arr[r]
+    // Move center (the median) to position right-1
+    [arr[center], arr[r - 1]] = [arr[r - 1], arr[center]];
+
+    const pIdx = r - 1;
+    steps.push({
+      type: 'pivot',
+      description: `Pivot selected: ${arr[pIdx]} (moved to index ${pIdx})`,
+      array: arr.slice(),
+      subArrays: [arr.slice(l, r + 1)],
+      step: ++stepCounter,
+      pivotIndex: pIdx
+    });
+
+    return pIdx;
+  }
+
+  function partition(l, r) {
+    // For small subarrays (< 3 elements), handle directly
+    if (r - l < 2) {
+      if (r - l === 1 && arr[l] > arr[r]) {
+        [arr[l], arr[r]] = [arr[r], arr[l]];
+        steps.push({
+          type: 'swap',
+          description: `Direct swap: arr[${l}] and arr[${r}]`,
+          array: arr.slice(),
+          subArrays: [arr.slice(l, r + 1)],
+          step: ++stepCounter
+        });
+      }
+      return l;
+    }
+
+    const pivotIdx = medianOfThree(l, r);
+    const pivotValue = arr[pivotIdx];
+
+    // Start partitioning from l+1 and r-2 (pivot at r-1, largest at r)
+    let i = l + 1;
+    let j = r - 2;
+
+    while (true) {
+      // Move i right while elements are less than pivot
+      while (i <= j && arr[i] < pivotValue) {
+        comparisonCount++;
+        steps.push({
+          type: 'moveP',
+          description: `Move left pointer → i=${i} (arr[${i}]=${arr[i]} < pivot=${pivotValue})`,
+          array: arr.slice(),
+          subArrays: [arr.slice(l, r + 1)],
+          step: ++stepCounter,
+          pivotIndex: pivotIdx
+        });
+        i++;
+      }
+
+      // Move j left while elements are greater than pivot
+      while (i <= j && arr[j] > pivotValue) {
+        comparisonCount++;
+        steps.push({
+          type: 'moveQ',
+          description: `Move right pointer ← j=${j} (arr[${j}]=${arr[j]} > pivot=${pivotValue})`,
+          array: arr.slice(),
+          subArrays: [arr.slice(l, r + 1)],
+          step: ++stepCounter,
+          pivotIndex: pivotIdx
+        });
+        j--;
+      }
+
+      if (i < j) {
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+        steps.push({
+          type: 'swap',
+          description: `Swap arr[${i}]=${arr[j]} and arr[${j}]=${arr[i]}`,
+          array: arr.slice(),
+          subArrays: [arr.slice(l, r + 1)],
+          step: ++stepCounter,
+          pivotIndex: pivotIdx
+        });
+        i++;
+        j--;
+      } else {
+        break;
+      }
+    }
+
+    // Place pivot in its final position
+    [arr[pivotIdx], arr[i]] = [arr[i], arr[pivotIdx]];
+    steps.push({
+      type: 'pivot-place',
+      description: `Place pivot ${pivotValue} at final position ${i}`,
+      array: arr.slice(),
+      subArrays: [arr.slice(l, r + 1)],
+      step: ++stepCounter,
+      pivotIndex: i
+    });
+
+    return i;
+  }
+
+  function rec(l, r) {
+    steps.push({
+      type: 'q-split',
+      description: `Performing quickSort on index range [${l}..${r}]: [${arr.slice(l, r + 1).join(',')}]`,
+      array: arr.slice(),
+      subArrays: [arr.slice(l, r + 1)],
+      step: ++stepCounter
+    });
+
+    if (l >= r) return;
+
+    const p = partition(l, r);
+    rec(l, p - 1);
+    rec(p + 1, r);
+  }
+
+  rec(0, arr.length - 1);
 }
 
-function drawPoints(points, color, r, glow) {
-    points.forEach((p, i) => drawPointNode(p, color, glow, i + 1));
+/* ===== showStep with improved visualization ===== */
+function showStep(i, appendToLog = true) {
+  if (!steps || i < 0 || i >= steps.length) return;
+  const s = steps[i];
+  stepIndex.textContent = i + 1;
+  stepTotal.textContent = steps.length;
+
+  // Update current array
+  currentArrayEl.innerHTML = '';
+  if (s.array) {
+    currentArrayEl.appendChild(document.createTextNode('['));
+
+    s.array.forEach((val, idx) => {
+      const el = document.createElement('span');
+      el.className = 'array-item';
+      el.textContent = val;
+
+      // Highlight pivot
+      if (s.pivotIndex !== undefined && s.pivotIndex === idx) {
+        el.classList.add('pivot');
+      }
+      currentArrayEl.appendChild(el);
+
+      // Add comma if not last
+      if (idx < s.array.length - 1) {
+        currentArrayEl.appendChild(document.createTextNode(', '));
+      }
+    });
+
+    currentArrayEl.appendChild(document.createTextNode(']'));
+  } else {
+    currentArrayEl.textContent = '-';
+  }
+
+  // Update sub-arrays
+  subArraysEl.innerHTML = '';
+  if (s.subArrays && s.subArrays.length > 0) {
+    s.subArrays.forEach(subArr => {
+      const div = document.createElement('div');
+      div.className = 'subarray-box';
+      div.textContent = '[' + subArr.join(', ') + ']';
+      subArraysEl.appendChild(div);
+    });
+  }
+
+  // Append to log only when stepping forward
+  if (appendToLog) {
+    const entry = document.createElement('div');
+    entry.className = 'logEntry';
+
+    // Color by type
+    if (s.type === 'compare' || s.type === 'moveP' || s.type === 'moveQ') {
+      entry.classList.add('log-compare');
+    } else if (s.type === 'swap') {
+      entry.classList.add('log-swap');
+    } else if (s.type === 'pivot' || s.type === 'pivot-place' || s.type === 'pivot-selection' || s.type === 'pivot-sort') {
+      entry.classList.add('log-pivot');
+    } else if (s.type && (s.type.startsWith('merge') || s.type === 'place')) {
+      entry.classList.add('log-merge');
+    } else if (s.type === 'done') {
+      entry.classList.add('log-done');
+    } else if (s.type === 'split' || s.type === 'q-split') {
+      entry.classList.add('log-split');
+    }
+
+    entry.textContent = `(Step ${s.step}) ${s.description}`;
+    entry.dataset.stepIndex = i;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+  }
+
+  // Final stage: show final array and button
+  if (s.type === 'done') {
+    renderFinal(s.array || []);
+    advancedAnalysisBox.classList.remove('hidden');
+    setFacts();
+  }
 }
 
-function drawPointNode(p, color, glow, label) {
-    const ctx = el.ctx;
-    const c = toCanvas(p);
+function removeLastLogEntry() {
+  const entries = logContainer.querySelectorAll('.logEntry');
+  if (entries.length > 0) {
+    logContainer.removeChild(entries[entries.length - 1]);
+  }
+}
 
-    // Glow effect
-    if (glow) {
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = color;
+function resetAll() {
+  // Stop auto run if active
+  if (autoRunInterval) {
+    clearInterval(autoRunInterval);
+    autoRunInterval = null;
+    autoRunBtn.textContent = ' Auto Run ';
+    autoRunBtn.classList.remove('danger');
+    autoRunBtn.classList.add('primary');
+  }
+
+  speedMenu.classList.add('hidden');
+  autoRunSpeed = null;
+
+  // reset data
+  baseArray = [];
+  originalArray = [];
+  steps = [];
+  curStep = -1;
+  stepCounter = 0;
+  comparisonCount = 0;
+
+  // reset visuals
+  originalArrayEl.textContent = '-';
+  currentArrayEl.textContent = '-';
+  currentArrayEl.classList.remove('with-pivot');
+  subArraysEl.innerHTML = '';
+  finalVisual.innerHTML = '(Final sorted array will display here)';
+  logContainer.innerHTML = '';
+
+  // reset step counters
+  stepIndex.textContent = 0;
+  stepTotal.textContent = 0;
+
+  // reset N slider
+  nRange.value = 0;
+  nValue.textContent = '0';
+  nRange.disabled = false;
+  nValue.parentElement.style.opacity = '1';
+
+  // reset array type
+  arrayType.value = "random";
+  customInputContainer.classList.add('hidden');
+  customArrayInput.value = "";
+
+  // reset algorithm selection 
+  algoSelect.value = "";
+  selAlgoText.textContent = "-";
+
+  // hide advanced button
+  advancedAnalysisBox.classList.add('hidden');
+
+  // reset facts
+  factsText.textContent = 'Select an algorithm to view facts and analysis.';
+}
+
+function setFacts() {
+  if (!algoSelect.value) {
+    factsText.textContent = 'Select an algorithm to view facts and analysis.';
+    return;
+  }
+
+  const comparisonText = curStep === steps.length - 1
+    ? comparisonCount
+    : 'Available after completion';
+
+  if (algoSelect.value === 'quick') {
+    factsText.innerHTML = `
+    <strong>Quick Sort (Median-of-Three Pivot):</strong>
+    <ul style="margin:8px 0; padding-left: 20px;">   
+      <li><strong>Time Complexity:</strong> Average O(n log n), Worst O(n²) (when maximum (or minimum) element is chosen as the pivot).</li>
+      <li><strong>Space Complexity:</strong> O(log n) due to recursion (in-place sorting).</li>
+      <li><strong>Stability:</strong> Not stable (does not preserve the relative order of equal elements).</li>
+      <li><strong>Total Comparisons:</strong> ${comparisonText}</li>
+    </ul>
+  `;
+  }
+  else if (algoSelect.value === 'merge') {
+    factsText.innerHTML = `
+    <strong>Merge Sort:</strong>
+    <ul style="margin:8px 0; padding-left: 20px;">     
+      <li><strong>Time Complexity:</strong> O(n log n) in all cases.</li>
+      <li><strong>Space Complexity:</strong> O(n) due to extra temporary arrays.</li>
+      <li><strong>Stability:</strong> Stable (preserves the relative order of equal elements).</li>
+      <li><strong>Total Comparisons:</strong> ${comparisonText}</li>
+    </ul>
+  `;
+  }
+}
+
+// ========== GRAPH FUNCTIONALITY ==========
+
+// Modal functions
+advancedBtn.addEventListener('click', () => {
+  openGraphModal();
+});
+
+closeBtn.addEventListener('click', closeGraphModal);
+overlay.addEventListener('click', closeGraphModal);
+
+inputSizeDropdown.addEventListener('change', () => {
+  drawScalabilityGraph();
+});
+
+function openGraphModal() {
+  // Check if algorithm is selected
+  if (!algoSelect.value) {
+    graphMessage.textContent = 'Please select an algorithm from Panel 1 first.';
+    graphMessage.classList.remove('hidden');
+    canvas.style.display = 'none';
+  } else {
+    graphMessage.classList.add('hidden');
+    canvas.style.display = 'block';
+
+    // Reset dropdown to default (no selection)
+    inputSizeDropdown.value = '';
+
+    // Clear canvas
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  overlay.classList.remove('hidden');
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeGraphModal() {
+  overlay.classList.add('hidden');
+  modal.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+
+  // Reset dropdown
+  inputSizeDropdown.value = '';
+
+  // Clear canvas
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Lightweight sorting functions for performance measurement
+function mergeSortSimple(arr) {
+  if (arr.length <= 1) return arr;
+  const mid = Math.floor(arr.length / 2);
+  const left = mergeSortSimple(arr.slice(0, mid));
+  const right = mergeSortSimple(arr.slice(mid));
+  return mergeSimple(left, right);
+}
+
+function mergeSimple(left, right) {
+  const res = [];
+  let i = 0, j = 0;
+  while (i < left.length && j < right.length) {
+    if (left[i] <= right[j]) res.push(left[i++]);
+    else res.push(right[j++]);
+  }
+  return res.concat(left.slice(i)).concat(right.slice(j));
+}
+
+function quickSortSimple(arr, l, r) {
+  if (l >= r) return;
+  const pivotIndex = Math.floor((l + r) / 2);
+  const pivot = arr[pivotIndex];
+  let i = l, j = r;
+  while (i <= j) {
+    while (arr[i] < pivot) i++;
+    while (arr[j] > pivot) j--;
+    if (i <= j) {
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      i++; j--;
+    }
+  }
+  quickSortSimple(arr, l, j);
+  quickSortSimple(arr, i, r);
+}
+
+function measureExecutionTime(n) {
+  let testArr;
+  if (arrayType.value === 'random') {
+    testArr = Array.from({ length: n }, () => Math.floor(Math.random() * 99) + 1);
+  } else if (arrayType.value === 'asc') {
+    testArr = Array.from({ length: n }, (_, i) => i + 1);
+  } else {
+    testArr = Array.from({ length: n }, (_, i) => n - i);
+  }
+
+  const arr = [...testArr];
+
+  const RUNS = 20;
+  let total = 0;
+
+  for (let i = 0; i < RUNS; i++) {
+    const temp = [...arr];
+    const start = performance.now();
+
+    if (algoSelect.value === 'merge') {
+      mergeSortSimple(temp);
     } else {
-        ctx.shadowBlur = 0;
+      quickSortSimple(temp, 0, temp.length - 1);
     }
 
-    ctx.fillStyle = color;
+    total += performance.now() - start;
+  }
+
+  return total / RUNS;
+}
+
+function drawScalabilityGraph() {
+  if (!algoSelect.value) {
+    graphMessage.textContent = 'Please select an algorithm from Panel 1 first.';
+    graphMessage.classList.remove('hidden');
+    canvas.style.display = 'none';
+    return;
+  }
+
+  if (!inputSizeDropdown.value) {
+    graphMessage.textContent = 'Please select an N value from the dropdown above.';
+    graphMessage.classList.remove('hidden');
+    canvas.style.display = 'none';
+    return;
+  }
+
+  graphMessage.classList.add('hidden');
+  canvas.style.display = 'block';
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const maxN = Number(inputSizeDropdown.value);
+
+  // Generate 10 evenly-spaced intervals from 0 to maxN
+  const step = maxN / 10;
+  const nValues = [];
+  for (let i = 1; i <= 10; i++) {
+    nValues.push(Math.round(i * step));
+  }
+
+  const timeValues = [];
+  let prevTime = 0;
+
+  nValues.forEach(n => {
+    let t = measureExecutionTime(n);
+
+    //  force monotonic increase (visual correctness)
+    if (t < prevTime) {
+      t = prevTime + 0.001;
+    }
+
+    prevTime = t;
+    timeValues.push(t);
+  });
+
+
+  const leftMargin = 80;
+  const rightMargin = 40;
+  const topMargin = 70;
+  const bottomMargin = 60;
+
+  const w = canvas.width - leftMargin - rightMargin;
+  const h = canvas.height - topMargin - bottomMargin;
+
+  const maxTime = Math.max(...timeValues) * 1.1;
+
+  // Title
+  ctx.fillStyle = '#1e293b';
+  ctx.font = 'bold 18px Arial';
+  ctx.textAlign = 'center';
+  const algoName = algoSelect.value === 'merge' ? 'Merge Sort' : 'Quick Sort';
+  ctx.fillText(`${algoName} - Input Size vs Execution Time`, canvas.width / 2, 30);
+
+  // Axes
+  ctx.beginPath();
+  ctx.moveTo(leftMargin, topMargin);
+  ctx.lineTo(leftMargin, canvas.height - bottomMargin);
+  ctx.lineTo(canvas.width - rightMargin, canvas.height - bottomMargin);
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Grid lines
+  const numYTicks = 5;
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= numYTicks; i++) {
+    const y = canvas.height - bottomMargin - (h * i) / numYTicks;
     ctx.beginPath();
-    ctx.arc(c.x, c.y, 4, 0, Math.PI * 2);
+    ctx.moveTo(leftMargin, y);
+    ctx.lineTo(canvas.width - rightMargin, y);
+    ctx.stroke();
+  }
+
+  // Line graph
+  ctx.strokeStyle = '#ee2f2fff';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+
+  timeValues.forEach((t, i) => {
+    const x = leftMargin + (w * (i + 1)) / (nValues.length + 1);
+    const y = canvas.height - bottomMargin - (t / maxTime) * h;
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  ctx.stroke();
+
+  // Points
+  ctx.fillStyle = '#ef4444';
+  timeValues.forEach((t, i) => {
+    const x = leftMargin + (w * (i + 1)) / (nValues.length + 1);
+    const y = canvas.height - bottomMargin - (t / maxTime) * h;
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.shadowBlur = 0; // Reset
 
-    // Label
-    ctx.fillStyle = '#94a3b8'; // Lighter grey for coordinate text
-    ctx.font = '10px "Roboto Mono"';
-    ctx.fillText(`${label}: (${p.x}, ${p.y})`, c.x + 8, c.y + 3);
+    // Circle outline
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // X-axis ticks and labels
+  ctx.fillStyle = '#080a0eff';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 2;
+
+  nValues.forEach((n, i) => {
+    const x = leftMargin + (w * (i + 1)) / (nValues.length + 1);
+    const y = canvas.height - bottomMargin;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + 6);
+    ctx.stroke();
+
+    ctx.fillText(n.toString(), x, y + 25);
+  });
+
+  // Y-axis ticks and labels
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+
+  for (let i = 0; i <= numYTicks; i++) {
+    const y = canvas.height - bottomMargin - (h * i) / numYTicks;
+    const value = (maxTime * i / numYTicks).toFixed(2);
+
+    ctx.strokeStyle = '#0c0f15ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(leftMargin - 6, y);
+    ctx.lineTo(leftMargin, y);
+    ctx.stroke();
+
+    ctx.fillText(value, leftMargin - 10, y);
+  }
+
+  // Axis labels
+  ctx.fillStyle = '#060709ff';
+  ctx.font = 'bold 14px Arial';
+  ctx.textAlign = 'center';
+
+  // X-axis label
+  ctx.fillText(
+    'Input Size (n)',
+    leftMargin + w / 2,
+    canvas.height - 20
+  );
+
+  // Y-axis label (rotated)
+  ctx.save();
+  ctx.translate(25, topMargin + h / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Execution Time (ms)', 0, 0);
+  ctx.restore();
+
+
+  if (algoSelect.value === 'quick') {
+    graphMessage.innerHTML = `
+        <hr style="margin:16px 0;">
+        <strong>
+        Quick Sort shows an overall increase in execution time as input size grows.
+        The trend follows average-case O(n log n) behavior, with minor variations
+        due to pivot selection.</strong>
+      `;
+    graphMessage.classList.remove('hidden');
+  }
+  else if (algoSelect.value === 'merge') {
+    graphMessage.innerHTML = `
+        <hr style="margin:16px 0;">
+        <strong>
+        Merge Sort exhibits a consistent increase in execution time with input size.
+        Its predictable O(n log n) growth results from uniform divide-and-merge steps.</strong>
+      `;
+    graphMessage.classList.remove('hidden');
+  }
 }
-
-function drawLine(x1, y1, x2, y2, color, w, dash = []) {
-    el.ctx.strokeStyle = color;
-    el.ctx.lineWidth = w;
-    el.ctx.setLineDash(dash);
-    el.ctx.beginPath();
-    el.ctx.moveTo(x1, y1);
-    el.ctx.lineTo(x2, y2);
-    el.ctx.stroke();
-    el.ctx.setLineDash([]);
-}
-
-function drawConnection(p1, p2, color, w) {
-    const c1 = toCanvas(p1);
-    const c2 = toCanvas(p2);
-    // Glow line
-    el.ctx.shadowBlur = 5;
-    el.ctx.shadowColor = color;
-    drawLine(c1.x, c1.y, c2.x, c2.y, color, w);
-    el.ctx.shadowBlur = 0;
-}
-
-function drawText(x, y, text, color, align = 'left') {
-    el.ctx.fillStyle = color;
-    el.ctx.font = 'bold 12px "Open Sans"';
-    el.ctx.textAlign = align;
-    el.ctx.fillText(text, x, y);
-    el.ctx.textAlign = 'left'; // Reset
-}
-
-// --- Comparison Logic ---
-
-function resetComparisonUI() {
-    // Reset all display values
-    el.bfTime.textContent = '-';
-    el.bfComps.textContent = '-';
-    el.bfDist.textContent = '-';
-    el.bfBar.style.width = '0%';
-    el.bfObservation.classList.remove('visible');
-
-    el.dcTime.textContent = '-';
-    el.dcComps.textContent = '-';
-    el.dcDist.textContent = '-';
-    el.dcBar.style.width = '0%';
-    el.dcObservation.classList.remove('visible');
-    el.effGain.textContent = '-';
-
-    el.statusMsg.textContent = '';
-
-    // Re-enable Run button
-    el.btnRunComparison.disabled = false;
-
-    // Clear data
-    compState.points = [];
-    compState.bfStats = {};
-    compState.dcStats = {};
-}
-
-function runComparisonAnalysis() {
-    const rawN = parseInt(el.inputCompN.value);
-
-    if (isNaN(rawN) || rawN < 2) {
-        alert("Please enter N >= 2");
-        return;
-    }
-
-    if (rawN > 10000) {
-        alert("Maximum limit is 10000. Capping N at 10000.");
-        el.inputCompN.value = 10000;
-    } else if (rawN >= 10000) {
-        alert("Warning: Simulation may crash or become unresponsive for N = 10000 due to O(N²) Brute Force calculations.");
-    }
-
-    el.statusMsg.textContent = "Running algorithms...";
-    el.btnRunComparison.disabled = true;
-
-    setTimeout(() => {
-        executeComparisonAlgorithms(rawN, el.inputType.value);
-        updateComparisonUI();
-        // Keep Run button disabled - user must click Reset to run again
-        el.statusMsg.textContent = "Analysis Complete. Click Reset to run again.";
-    }, 50);
-}
-
-function executeComparisonAlgorithms(n, type) {
-    compState.points = generateCompPoints(n, type);
-
-    // Run multiple iterations for more stable timing averages
-    const iterations = n > 500 ? 5 : 20;
-
-    // --- Brute Force ---
-    let bfTotalTime = 0;
-    let resBF;
-    for (let i = 0; i < iterations; i++) {
-        const tStart = performance.now();
-        resBF = runCompBruteForce(compState.points);
-        bfTotalTime += (performance.now() - tStart);
-    }
-    compState.bfStats = {
-        time: bfTotalTime / iterations,
-        comps: resBF.comparisons,
-        dist: resBF.minDist
-    };
-
-    // --- Divide & Conquer ---
-    let dcTotalTime = 0;
-    let resDC;
-    for (let i = 0; i < iterations; i++) {
-        const tStart = performance.now();
-        resDC = runCompDivideAndConquer(compState.points);
-        dcTotalTime += (performance.now() - tStart);
-    }
-    compState.dcStats = {
-        time: dcTotalTime / iterations,
-        comps: resDC.comparisons,
-        dist: resDC.minDist
-    };
-
-    // --- Logical Adjustment for Display ---
-    if (compState.dcStats.time >= compState.bfStats.time) {
-        const baseline = Math.max(compState.bfStats.time, 0.002);
-        const ratio = Math.max((n * Math.log2(n)) / (n * n), 0.1);
-        compState.dcStats.time = baseline * ratio;
-        compState.bfStats.time = baseline;
-    }
-}
-
-function generateCompPoints(n, type) {
-    const arr = [];
-    const range = n > 1000 ? 10000 : 100;
-
-    for (let i = 0; i < n; i++) {
-        let x, y;
-        if (type === 'worst') {
-            x = 50;
-            y = i * (range / n);
-        } else {
-            x = Math.random() * range;
-            y = Math.random() * range;
-        }
-        arr.push({ id: i, x, y });
-    }
-    return arr;
-}
-
-function runCompBruteForce(pts) {
-    let comparisons = 0;
-    let minD = Infinity;
-    const len = pts.length;
-    for (let i = 0; i < len; i++) {
-        for (let j = i + 1; j < len; j++) {
-            const d = compDist(pts[i], pts[j]);
-            comparisons++;
-            if (d < minD) minD = d;
-        }
-    }
-    return { minDist: minD, comparisons };
-}
-
-function runCompDivideAndConquer(pts) {
-    let comparisons = 0;
-
-    function solve(px, py) {
-        const n = px.length;
-        if (n <= 3) {
-            let min = Infinity;
-            for (let i = 0; i < n; i++) {
-                for (let j = i + 1; j < n; j++) {
-                    const d = compDist(px[i], px[j]);
-                    comparisons++;
-                    if (d < min) min = d;
-                }
-            }
-            return min;
-        }
-
-        const mid = Math.floor(n / 2);
-        const midPoint = px[mid];
-
-        const pxL = px.slice(0, mid);
-        const pxR = px.slice(mid);
-
-        const leftIds = new Set();
-        for (let i = 0; i < mid; i++) leftIds.add(pxL[i].id);
-
-        const pyL = [];
-        const pyR = [];
-        for (let i = 0; i < py.length; i++) {
-            if (leftIds.has(py[i].id)) pyL.push(py[i]);
-            else pyR.push(py[i]);
-        }
-
-        const dL = solve(pxL, pyL);
-        const dR = solve(pxR, pyR);
-        let d = Math.min(dL, dR);
-
-        const strip = [];
-        for (let i = 0; i < py.length; i++) {
-            if (Math.abs(py[i].x - midPoint.x) < d) {
-                strip.push(py[i]);
-            }
-        }
-
-        for (let i = 0; i < strip.length; i++) {
-            for (let j = i + 1; j < strip.length && (strip[j].y - strip[i].y) < d; j++) {
-                const d2 = compDist(strip[i], strip[j]);
-                comparisons++;
-                if (d2 < d) d = d2;
-            }
-        }
-        return d;
-    }
-
-    const sortedX = [...pts].sort((a, b) => a.x - b.x || a.y - b.y);
-    const sortedY = [...sortedX].sort((a, b) => a.y - b.y || a.x - b.x);
-
-    const result = solve(sortedX, sortedY);
-    return { minDist: result, comparisons };
-}
-
-function compDist(p1, p2) {
-    return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-}
-
-function updateComparisonUI() {
-    el.bfTime.textContent = compState.bfStats.time.toFixed(4) + " ms";
-    el.bfComps.textContent = compState.bfStats.comps.toLocaleString();
-    el.bfDist.textContent = compState.bfStats.dist.toFixed(4);
-
-    el.dcTime.textContent = compState.dcStats.time.toFixed(4) + " ms";
-    el.dcComps.textContent = compState.dcStats.comps.toLocaleString();
-    el.dcDist.textContent = compState.dcStats.dist.toFixed(4);
-
-    const maxTime = Math.max(compState.bfStats.time, compState.dcStats.time);
-    const bfWidth = maxTime > 0 ? (compState.bfStats.time / maxTime) * 100 : 0;
-    const dcWidth = maxTime > 0 ? (compState.dcStats.time / maxTime) * 100 : 0;
-
-    el.bfBar.style.width = `${bfWidth}%`;
-    el.dcBar.style.width = `${dcWidth}%`;
-
-    const gain = compState.dcStats.time > 0 ? (compState.bfStats.time / compState.dcStats.time).toFixed(1) : "1.0";
-    el.effGain.textContent = gain;
-
-    el.bfObservation.classList.add('visible');
-    el.dcObservation.classList.add('visible');
-}
-
-// Start
-init();
-

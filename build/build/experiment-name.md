@@ -1,1 +1,1 @@
-## Divide and Conquer Approach: Closest Pair of Points in 2D Euclidean Space
+## Divide & Conquer Strategies I: Sorting (MergeSort & QuickSort)
