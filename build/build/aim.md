@@ -1,8 +1,7 @@
-### Aim of the Experiment
+### Aim of the experiment
 
-1. To implement and visualize Divide and Conquer based sorting algorithms: Merge Sort and Quick Sort, and observe their step-by-step process of problem decomposition and merging/partitioning on randomly generated input lists.
+1. To implement and visualize the Divide and Conquer algorithm for finding the closest pair of points in a two-dimensional plane, and observe the step-by-step process of spatial decomposition, recursive subdivision, and strip-based comparison on randomly generated point sets.
 
-
-2. To analyze and compare their efficiency in terms of time complexity, number of comparisons performed, and scalability with increasing input size.
+2. To analyze and compare the algorithm’s efficiency under best-case and worst-case scenarios in terms of execution time, number of distance computations, and scalability, and to highlight the limitations of the brute force approach for large input sizes.
 
 

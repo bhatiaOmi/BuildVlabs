@@ -1,65 +1,63 @@
-### User Input
+### Procedure
 
-1. Select the desired sorting algorithm from the dropdown menu:
-   - Merge Sort
-   - Quick Sort 
+1. Open the **Closest Pair of Points – Divide & Conquer Simulation** experiment.
 
-2. Adjust the value of **N** (number of elements in the array) using the slider provided.
+2. Enter the desired number of points **N** in the input field **“Enter Number of Points (N)”**.
 
-3. Select the type of input array from the dropdown menu:
-   - Randomly generated array
-   - Already sorted array (ascending order)
-   - Already sorted array (descending order)
+3. Click the **Generate Points** button.
 
-4. Click the **Run Simulation** button to generate the input array and initialize the selected sorting algorithm.
+4. Randomly generated 2D coordinate points are displayed in the **Generated Coordinates** panel.
 
----
+5. The same points are plotted on the visualization canvas.
 
-### Calculations / Simulation Steps
+6. Observe the plotted points on the canvas before the algorithm starts.
 
-1. Click the **Next** button to execute the sorting algorithm step-by-step.
+7. Click the **Auto Play** button to begin the simulation automatically.
 
-2. Observe the comparison, movement, and placement of elements at each step of the algorithm.
+8. Select the execution speed (**Slow / Normal / Fast**) from the speed dropdown next to **Auto Play**.
 
-3. During **Merge Sort** execution, observe the following:
-   - Recursive splitting of the array into smaller subarrays
-   - Merging of subarrays in sorted order based on element comparison
+9. During execution, observe the following steps in the **Algorithm Steps** panel:
+   - Sorting of points based on X-coordinates  
+   - Recursive division of the point set into left and right halves  
+   - Drawing of the Division Line  
+   - Formation of the Strip Region near the dividing line  
+   - Comparison of point pairs inside the strip  
+   - Updates to the current minimum distance  
 
-4. During **Quick Sort (Median-of-Three)** execution, observe the following:
-   - Selection of the pivot using the Median-of-Three method
-   - Movement of pointer **i** from left to right
-   - Movement of pointer **j** from right to left
-   - Swapping of elements when misplaced values are detected
-   - Placement of the pivot element at its correct sorted position after pointer crossing
+10. Use the **Next →** button to execute the algorithm step-by-step manually.
 
-5. Click the **Previous** button to revisit earlier steps and analyze the algorithm’s behavior in detail.
+11. Use the **← Previous** button to revisit earlier steps and analyze recursive divisions and comparisons.
 
-6. Click the **Auto-Run** button to automatically execute all remaining steps until the sorting process is completed.
+12. Observe the following visual indicators during execution:
+    - **Blue line** → Division Line  
+    - **Orange line** → Pair under review  
+    - **Green line** → Best (closest) pair found so far  
 
----
+13. Monitor real-time metrics displayed below the canvas:
+    - Minimum Distance  
+    - Number of Comparisons  
 
-### Scalability Analysis (Graph Visualization)
+14. Click the **Runtime Metrics** button to view dynamic parameters such as:
+    - Total comparisons using Divide & Conquer  
+    - Execution time  
+    - Comparisons saved compared to brute force  
 
-1. After completing the simulation, click the **Scalability Graph** option.
+15. Click the **Advanced Analysis** button to compare performance with the brute force approach:
+    - Observe Brute Force (O(N²)) execution time and comparisons    
+    - Observe Divide & Conquer (O(N log N)) execution time and comparisons 
+    - Compare efficiency using the visual progress bars  
 
-2. Select the maximum input size **N** from the dropdown menu.
+16. In the **Advanced Analysis** panel:
+    - Adjust input size (**N**) for scalability testing  
+    - Select points distribution:
+      - Worst Case (Collinear)  
+      - Best Case (Clusters)  
 
-3. The system automatically generates multiple input sizes up to the selected **N** and measures the execution time for each.
+17. Click **Run Analysis** to execute the comparison for the selected input size and distribution.
 
-4. Observe the plotted graph of **Input Size (n)** versus **Execution Time (ms)**.
+18. Observe the comparison results for:
+    - Execution Time  
+    - Number of Distance Computations  
+    - Efficiency improvement of Divide & Conquer over brute force  
 
-5. Analyze how the execution time increases with respect to input size for the selected algorithm.
-
----
-
-### Results
-
-1. Observe the **final sorted array** displayed after completion of the simulation.
-
-2. Analyze the **Step Log**, which records each operation performed by the algorithm along with the corresponding array state.
-
-3. Study the **Scalability Graph analysis**, which highlights:
-   - Growth of execution time with increasing input size
-   - Average-case behavior of Quick Sort (O(n log n))
-   - Consistent performance of Merge Sort (O(n log n))
-   - Practical differences in scalability between the two algorithms
+19. Click the **Reset** button to clear the current experiment and run the simulation again with a new input.

@@ -1,152 +1,256 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Divide & Conquer — Sorting Simulator</title>
-  <link rel="stylesheet" href="css/main.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closest Pair: Divide & Conquer Analysis</title>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
 </head>
 
-<body class="with-bg advanced">
+<body>
+    <div class="main-container">
 
-  <header>
-    <h1></h1>
-  </header>
+        <!-- ========== SIMULATION VIEW (Page 1) ========== -->
+        <div id="simulationView" class="simulation-view">
+            <!-- CONFIGURATION & DATA PANEL -->
+            <section class="config-panel" style="position: relative;">
+                <div class="controls-row">
+                    <label for="pointCount">Enter Number of Points (N):</label>
+                    <input type="text" id="pointCount" placeholder="e.g. 10" value="10">
+                    <button id="btnGenerate" class="btn btn-primary">Generate Points</button>
+                    <button id="btnReset" class="btn btn-secondary">Reset</button>
 
-  <main class="layout">
-    <!-- LEFT: Controls -->
-    <section class="panel left">
-      <h2>Controls</h2>
+                    <!-- Advanced Button Pushed to Right -->
+                    <button id="btnShowAdvanced" class="btn btn-primary" style="margin-left: auto;">
+                        Advanced Analysis
+                    </button>
+                </div>
 
-      <label>Choose Algorithm</label>
-      <select id="algoSelect">
-        <option value="" disabled selected hidden>
-          -- Select Algorithm --
-        </option>
-        <option value="merge">Merge Sort</option>
-        <option value="quick">Quick Sort</option>
-      </select>
+                <div class="divider"></div>
 
-      <label>
-        Max value of N: <strong><span id="nValue">0</span></strong>
-      </label>
-      <input type="range" id="nRange" min="0" max="20" value="0" />
+                <div class="coordinates-row">
+                    <h3>Generated Coordinates:</h3>
+                    <div id="coordinateList" class="coordinate-box">
+                        <span class="placeholder">Points will appear here after generation...</span>
+                    </div>
+                </div>
+            </section>
 
-      <label>Array choice</label>
-      <select id="arrayType">
-        <option value="random">Randomly generated</option>
-        <option value="asc">Already sorted (ascending)</option>
-        <option value="desc">Already sorted (descending)</option>
-        <option value="custom">Custom Input</option>
-      </select>
+            <!-- MAIN LAYOUT: Split between Viz and Right Controls -->
+            <div class="content-split">
 
-      <div id="customInputContainer" class="hidden">
-        <label>Enter array numbers (max 20):</label>
-        <input type="text" id="customArrayInput" placeholder="e.g., 10, 5, 8, 3" autocomplete="off" />
-      </div>
+                <!-- VISUALIZATION -->
+                <div class="viz-container">
+                    <div class="canvas-frame">
+                        <canvas id="mainCanvas"></canvas>
+                    </div>
+                    <div class="stats-bar">
+                        <span>Min Distance: <b id="currentMinVal">-</b></span>
+                        <span>Comparisons: <b id="compCount">-</b></span>
+                        <button id="btnDynamicParams" class="btn-sm">Runtime Metrics</button>
+                    </div>
+                </div>
 
-      <div class="bottom-actions">
-        <button id="runBtn" class="btn primary run-btn">
-          Generate Array
-        </button>
-        <button id="resetBtn" class="btn danger run-btn">
-          Reset
-        </button>
-      </div>
+                <!-- RIGHT PANEL: Controls & Logs -->
+                <aside class="right-panel">
+                    <div class="nav-controls">
+                        <button id="btnPrev" class="btn btn-nav">&larr; Previous</button>
+                        <div class="dropdown-container">
+                            <button id="btnAuto" class="btn btn-nav">Auto Play &#9662;</button>
+                            <div id="speedDropdown" class="dropdown-menu hidden">
+                                <div class="dropdown-item" data-speed="1500">Slow</div>
+                                <div class="dropdown-item" data-speed="800">Normal</div>
+                                <div class="dropdown-item" data-speed="200">Fast</div>
+                            </div>
+                        </div>
+                        <button id="btnNext" class="btn btn-nav">Next &rarr;</button>
+                    </div>
 
-    </section>
+                    <div class="step-log-container">
+                        <div class="log-header">
+                            <h3>Algorithm Steps</h3>
+                            <span class="step-info">Steps: <b id="stepCounter">0/0</b></span>
+                        </div>
+                        <div id="logContainer" class="log-list">
+                            <div class="log-entry system">Ready. Generate points to begin.</div>
+                        </div>
+                    </div>
 
-    <!-- CENTER: Visualization & step controls -->
-    <section class="panel center">
-      <h2>Array Visualization</h2>
+                    <div class="legend">
+                        <h4>Legend</h4>
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <span class="dot" style="background:#2563eb"></span> Division Line
+                            </div>
+                            <div class="legend-item">
+                                <span class="dot" style="background:#f59e0b"></span> Review Pair
+                            </div>
+                            <div class="legend-item">
+                                <span class="dot" style="background:#16a34a"></span> Best Pair
+                            </div>
+                        </div>
+                    </div>
 
-      <!-- Original Array -->
-      <div class="originalArrayBox">
-        <h3>Original Array:</h3>
-        <div id="originalArray" class="arrayDisplay">-</div>
-      </div>
+                </aside>
 
-      <!-- Current State -->
-      <div class="currentStateBox">
-        <h3>Current Array:</h3>
-        <div id="currentArray" class="currentArray">-</div>
-
-        <div class="subArraysContainer">
-          <h4>Sub-Arrays:</h4>
-          <div id="subArrays" class="subArrayBoxes"></div>
+            </div>
         </div>
-      </div>
 
-      <div class="selectedAlgo">Selected: <em id="selAlgoText">-</em></div>
+        <!-- ========== COMPARISON VIEW (Page 2) ========== -->
+        <div id="comparisonView" class="comparison-view">
+            <div class="comparison-container">
+                <!-- 1. INPUTS -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>Configuration</h2>
+                        <button id="btnGoBack" class="btn btn-sm" style="background: #2563eb; color: #fff;">Go
+                            Back</button>
+                    </div>
 
-      <div class="step-controls">
-        <button id="prevStep" class="btn"> Previous </button>
-        <div class="autoRun-wrapper">
-          <button id="autoRun" class="btn primary"> Auto Run </button>
-          <div id="speedMenu" class="speed-menu hidden">
-            <button data-speed="1500">Slow</button>
-            <button data-speed="800">Normal</button>
-            <button data-speed="200">Fast</button>
-          </div>
+                    <div class="input-group">
+                        <label for="inputN">Input Size (N):</label>
+                        <input type="number" id="inputN" value="1000" min="10" max="10000" placeholder="e.g. 1000">
+                        <small style="color: #64748b;">Try N = 10, 100, 1000, 5000 (Max 10000)</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="inputType">Points Distribution:</label>
+                        <select id="inputType">
+                            <option value="random">Random Uniform</option>
+                            <option value="worst">Worst Case (Collinear)</option>
+                            <option value="best">Best Case (Clusters)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 8px;">
+                        <button id="btnRunComparison" class="btn btn-primary" style="flex: 1;">Run Analysis</button>
+                        <button id="btnResetComparison" class="btn btn-secondary" style="flex: 1;">Reset</button>
+                    </div>
+                    <div id="statusMsg" style="text-align: center; color: #64748b; font-size: 0.8rem; height: 20px;">
+                    </div>
+                </div>
+
+                <!-- 2. BRUTE FORCE RESULTS -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>Brute Force (O(N²))</h2>
+                    </div>
+
+                    <div class="result-box">
+                        <div class="metric-row">
+                            <span>Execution Time:</span>
+                            <span id="bfTime" class="metric-val">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Comparisons:</span>
+                            <span id="bfComps" class="metric-val">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Min Distance:</span>
+                            <span id="bfDist" class="metric-val">-</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 0.85rem; margin-bottom: 5px;">Complexity Visualization</h4>
+                        <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Relative Time taken:</div>
+                        <div class="bar-container">
+                            <div id="bfBar" class="bar-fill bf-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Observation - shown after running -->
+                    <div id="bfObservation" class="observation-box bf-obs">
+                        <strong>Observation:</strong>
+                        <ul style="margin: 5px 0 0 15px; padding: 0;">
+                            <li>Checks every single pair.</li>
+                            <li>Total pairs = N × (N - 1) / 2</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. DIVIDE & CONQUER RESULTS -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2>Divide & Conquer (O(N log N))</h2>
+                    </div>
+
+                    <div class="result-box">
+                        <div class="metric-row">
+                            <span>Execution Time:</span>
+                            <span id="dcTime" class="metric-val">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Comparisons:</span>
+                            <span id="dcComps" class="metric-val">-</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Min Distance:</span>
+                            <span id="dcDist" class="metric-val">-</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 0.85rem; margin-bottom: 5px;">Complexity Visualization</h4>
+                        <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Relative Time taken:</div>
+                        <div class="bar-container">
+                            <div id="dcBar" class="bar-fill dc-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Observation - shown after running -->
+                    <div id="dcObservation" class="observation-box dc-obs">
+                        <strong>Observation:</strong>
+                        <ul style="margin: 5px 0 0 15px; padding: 0;">
+                            <li>Significantly fewer comparisons using spatial partitioning.</li>
+                            <li><strong>Efficiency:</strong> <span id="effGain" style="font-weight: bold;">-</span>x
+                                faster.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button id="nextStep" class="btn "> Next </button>
-        <span class="stepInfo">Step <span id="stepIndex">0</span> / <span id="stepTotal">0</span></span>
-      </div>
 
-      <div class="stepLog">
-        <h3>Step Log:</h3>
-        <div id="logContainer" class="logBox"></div>
-      </div>
-    </section>
-
-    <!-- RIGHT: Final array, facts -->
-    <section class="panel right">
-      <h2>Result & Analysis</h2>
-
-      <div class="resultBox">
-        <h3>Final Sorted Array</h3>
-        <div id="finalVisual" class="finalVisual">(Sorted array will appear here)</div>
-      </div>
-
-      <div class="facts">
-        <h3>Facts & Analysis</h3>
-        <div id="factsText">Choose algorithm and run to see facts relevant to the run.</div>
-
-        <div id="advancedAnalysisBox" class="hidden">
-          <button id="advancedBtn" class="scalability-btn">
-            Scalability Graph
-          </button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Scalability Graph Modal -->
-  <div id="graphOverlay" class="overlay hidden"></div>
-  <div id="graphModal" class="graph-modal hidden">
-    <div class="graph-header">
-      <h3>Scalability Analysis: Input Size vs Time</h3>
-      <button id="closeGraphBtn">✖</button>
     </div>
 
-    <div class="modal-controls">
-      <label for="inputSizeDropdown">Select N value:</label>
-      <select id="inputSizeDropdown">
-        <option value="" disabled selected hidden>-- Max value of N --</option>
-        <option value="1000">1000</option>
-        <option value="1500">1500</option>
-        <option value="2000">2000</option>
-        <option value="2500">2500</option>
-        <option value="3000">3000</option>
-      </select>
+
+    <!-- Modal for Dynamic Parameters -->
+    <div id="paramsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Dynamic Parameters Analysis</h2>
+            <div class="params-grid">
+                <div class="param-card">
+                    <h4>Total Comparisons (D&C)</h4>
+                    <p id="pCompDC">-</p>
+                </div>
+                <div class="param-card">
+                    <h4>Total Comparisons (Brute Force)</h4>
+                    <p id="pCompBF">-</p>
+                </div>
+                <div class="param-card">
+                    <h4>Comparisons Saved</h4>
+                    <p id="pSaved">-</p>
+                </div>
+                <div class="param-card">
+                    <h4>Execution Time</h4>
+                    <p id="pExecTime">-</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p>Calculated for current set of N points.</p>
+            </div>
+        </div>
     </div>
 
-    <canvas id="scalabilityCanvas" width="700" height="380"></canvas>
-    <div id="graphMessage" class="graph-message hidden"></div>
-  </div>
+    <script src="js/main.js"></script>
 
-  <script src="js/main.js"></script>
 <script src="..\assets\js\iframeResize.js"></script></body>
 
 </html>

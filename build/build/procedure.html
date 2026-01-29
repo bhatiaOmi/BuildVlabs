@@ -7,7 +7,7 @@
     
     	<meta name="experiment-short-name" content="">
     	<meta name="developer-institute" content="">
-    	<meta name="learning-unit" content="DIVIDE &amp; CONQUER STRATEGIES I: SORTING (MERGESORT &amp; QUICKSORT)">
+    	<meta name="learning-unit" content="DIVIDE AND CONQUER APPROACH: CLOSEST PAIR OF POINTS IN 2D EUCLIDEAN SPACE">
     	<meta name="task-name" content="Procedure">
     
     <!-- For iPhone -->
@@ -70,7 +70,7 @@
             </div>      <div class="svc-rating-submit">
                 <rating-submit title="Rate" this="" experiment="">
                 </rating-submit>
-            </div>      <bug-report id="bug-report" title="[BUG REPORT] DIVIDE &amp; CONQUER STRATEGIES I: SORTING (MERGESORT &amp; QUICKSORT)" page-type="text" context-info="{&quot;organisation&quot;:&quot;Virtual Labs&quot;,&quot;expname&quot;:&quot;DIVIDE &amp; CONQUER STRATEGIES I: SORTING (MERGESORT &amp; QUICKSORT)&quot;}" checkbox-json="{&quot;text&quot;:[&quot;Insufficient Content&quot;],&quot;video&quot;:[&quot;Insufficient Content&quot;],&quot;assesment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;assessment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;simulation&quot;:[&quot;Simulation Not Working&quot;,&quot;Incorrect Results/Observations&quot;,&quot;Insufficient/Incorrect Instructions&quot;],&quot;DEFAULT&quot;:[&quot;Page Not Loading&quot;,&quot;Content Not Visible&quot;,&quot;Incorrect Content&quot;]}" button_style="border: none; color: #fff; background-color: #288ec8; text-align: center; font-size: 1.05rem; border-radius: 1em;padding: 0.6em 1.2em; margin: 0 10px" position="override" custom_button_class="v-button"></bug-report>
+            </div>      <bug-report id="bug-report" title="[BUG REPORT] DIVIDE AND CONQUER APPROACH: CLOSEST PAIR OF POINTS IN 2D EUCLIDEAN SPACE" page-type="text" context-info="{&quot;organisation&quot;:&quot;Virtual Labs&quot;,&quot;expname&quot;:&quot;DIVIDE AND CONQUER APPROACH: CLOSEST PAIR OF POINTS IN 2D EUCLIDEAN SPACE&quot;}" checkbox-json="{&quot;text&quot;:[&quot;Insufficient Content&quot;],&quot;video&quot;:[&quot;Insufficient Content&quot;],&quot;assesment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;assessment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;simulation&quot;:[&quot;Simulation Not Working&quot;,&quot;Incorrect Results/Observations&quot;,&quot;Insufficient/Incorrect Instructions&quot;],&quot;DEFAULT&quot;:[&quot;Page Not Loading&quot;,&quot;Content Not Visible&quot;,&quot;Incorrect Content&quot;]}" button_style="border: none; color: #fff; background-color: #288ec8; text-align: center; font-size: 1.05rem; border-radius: 1em;padding: 0.6em 1.2em; margin: 0 10px" position="override" custom_button_class="v-button"></bug-report>
           </div>
         </nav>
       </header>
@@ -327,90 +327,94 @@
                 </div>
           </div>          <div class="vlabs-page-content px-5 pb-4 flex-grow-1 markdown-body">
             <div class="text-center fix-spacing">
-              <h2 id="divide--conquer-strategies-i-sorting-mergesort--quicksort">Divide &amp; Conquer Strategies I: Sorting (MergeSort &amp; QuickSort)</h2>
+              <h2 id="divide-and-conquer-approach-closest-pair-of-points-in-2d-euclidean-space">Divide and Conquer Approach: Closest Pair of Points in 2D Euclidean Space</h2>
           
             </div>
-              <h3 id="user-input">User Input</h3>
+              <h3 id="procedure">Procedure</h3>
           <ol>
-          <li><p>Select the desired sorting algorithm from the dropdown menu:</p>
+          <li><p>Open the <strong>Closest Pair of Points – Divide &amp; Conquer Simulation</strong> experiment.</p>
+          </li>
+          <li><p>Enter the desired number of points <strong>N</strong> in the input field <strong>“Enter Number of Points (N)”</strong>.</p>
+          </li>
+          <li><p>Click the <strong>Generate Points</strong> button.</p>
+          </li>
+          <li><p>Randomly generated 2D coordinate points are displayed in the <strong>Generated Coordinates</strong> panel.</p>
+          </li>
+          <li><p>The same points are plotted on the visualization canvas.</p>
+          </li>
+          <li><p>Observe the plotted points on the canvas before the algorithm starts.</p>
+          </li>
+          <li><p>Click the <strong>Auto Play</strong> button to begin the simulation automatically.</p>
+          </li>
+          <li><p>Select the execution speed (<strong>Slow / Normal / Fast</strong>) from the speed dropdown next to <strong>Auto Play</strong>.</p>
+          </li>
+          <li><p>During execution, observe the following steps in the <strong>Algorithm Steps</strong> panel:</p>
           <ul>
-          <li>Merge Sort</li>
-          <li>Quick Sort </li>
+          <li>Sorting of points based on X-coordinates  </li>
+          <li>Recursive division of the point set into left and right halves  </li>
+          <li>Drawing of the Division Line  </li>
+          <li>Formation of the Strip Region near the dividing line  </li>
+          <li>Comparison of point pairs inside the strip  </li>
+          <li>Updates to the current minimum distance  </li>
           </ul>
           </li>
-          <li><p>Adjust the value of <strong>N</strong> (number of elements in the array) using the slider provided.</p>
+          <li><p>Use the <strong>Next →</strong> button to execute the algorithm step-by-step manually.</p>
           </li>
-          <li><p>Select the type of input array from the dropdown menu:</p>
+          <li><p>Use the <strong>← Previous</strong> button to revisit earlier steps and analyze recursive divisions and comparisons.</p>
+          </li>
+          <li><p>Observe the following visual indicators during execution:</p>
           <ul>
-          <li>Randomly generated array</li>
-          <li>Already sorted array (ascending order)</li>
-          <li>Already sorted array (descending order)</li>
+          <li><strong>Blue line</strong> → Division Line  </li>
+          <li><strong>Orange line</strong> → Pair under review  </li>
+          <li><strong>Green line</strong> → Best (closest) pair found so far  </li>
           </ul>
           </li>
-          <li><p>Click the <strong>Run Simulation</strong> button to generate the input array and initialize the selected sorting algorithm.</p>
-          </li>
-          </ol>
-          <hr>
-          <h3 id="calculations--simulation-steps">Calculations / Simulation Steps</h3>
-          <ol>
-          <li><p>Click the <strong>Next</strong> button to execute the sorting algorithm step-by-step.</p>
-          </li>
-          <li><p>Observe the comparison, movement, and placement of elements at each step of the algorithm.</p>
-          </li>
-          <li><p>During <strong>Merge Sort</strong> execution, observe the following:</p>
+          <li><p>Monitor real-time metrics displayed below the canvas:</p>
           <ul>
-          <li>Recursive splitting of the array into smaller subarrays</li>
-          <li>Merging of subarrays in sorted order based on element comparison</li>
+          <li>Minimum Distance  </li>
+          <li>Number of Comparisons  </li>
           </ul>
           </li>
-          <li><p>During <strong>Quick Sort (Median-of-Three)</strong> execution, observe the following:</p>
+          <li><p>Click the <strong>Runtime Metrics</strong> button to view dynamic parameters such as:</p>
           <ul>
-          <li>Selection of the pivot using the Median-of-Three method</li>
-          <li>Movement of pointer <strong>i</strong> from left to right</li>
-          <li>Movement of pointer <strong>j</strong> from right to left</li>
-          <li>Swapping of elements when misplaced values are detected</li>
-          <li>Placement of the pivot element at its correct sorted position after pointer crossing</li>
+          <li>Total comparisons using Divide &amp; Conquer  </li>
+          <li>Execution time  </li>
+          <li>Comparisons saved compared to brute force  </li>
           </ul>
           </li>
-          <li><p>Click the <strong>Previous</strong> button to revisit earlier steps and analyze the algorithm’s behavior in detail.</p>
-          </li>
-          <li><p>Click the <strong>Auto-Run</strong> button to automatically execute all remaining steps until the sorting process is completed.</p>
-          </li>
-          </ol>
-          <hr>
-          <h3 id="scalability-analysis-graph-visualization">Scalability Analysis (Graph Visualization)</h3>
-          <ol>
-          <li><p>After completing the simulation, click the <strong>Scalability Graph</strong> option.</p>
-          </li>
-          <li><p>Select the maximum input size <strong>N</strong> from the dropdown menu.</p>
-          </li>
-          <li><p>The system automatically generates multiple input sizes up to the selected <strong>N</strong> and measures the execution time for each.</p>
-          </li>
-          <li><p>Observe the plotted graph of <strong>Input Size (n)</strong> versus <strong>Execution Time (ms)</strong>.</p>
-          </li>
-          <li><p>Analyze how the execution time increases with respect to input size for the selected algorithm.</p>
-          </li>
-          </ol>
-          <hr>
-          <h3 id="results">Results</h3>
-          <ol>
-          <li><p>Observe the <strong>final sorted array</strong> displayed after completion of the simulation.</p>
-          </li>
-          <li><p>Analyze the <strong>Step Log</strong>, which records each operation performed by the algorithm along with the corresponding array state.</p>
-          </li>
-          <li><p>Study the <strong>Scalability Graph analysis</strong>, which highlights:</p>
+          <li><p>Click the <strong>Advanced Analysis</strong> button to compare performance with the brute force approach:</p>
           <ul>
-          <li>Growth of execution time with increasing input size</li>
-          <li>Average-case behavior of Quick Sort (O(n log n))</li>
-          <li>Consistent performance of Merge Sort (O(n log n))</li>
-          <li>Practical differences in scalability between the two algorithms</li>
+          <li>Observe Brute Force (O(N²)) execution time and comparisons    </li>
+          <li>Observe Divide &amp; Conquer (O(N log N)) execution time and comparisons </li>
+          <li>Compare efficiency using the visual progress bars  </li>
           </ul>
+          </li>
+          <li><p>In the <strong>Advanced Analysis</strong> panel:</p>
+          <ul>
+          <li>Adjust input size (<strong>N</strong>) for scalability testing  </li>
+          <li>Select points distribution:<ul>
+          <li>Worst Case (Collinear)  </li>
+          <li>Best Case (Clusters)  </li>
+          </ul>
+          </li>
+          </ul>
+          </li>
+          <li><p>Click <strong>Run Analysis</strong> to execute the comparison for the selected input size and distribution.</p>
+          </li>
+          <li><p>Observe the comparison results for:</p>
+          <ul>
+          <li>Execution Time  </li>
+          <li>Number of Distance Computations  </li>
+          <li>Efficiency improvement of Divide &amp; Conquer over brute force  </li>
+          </ul>
+          </li>
+          <li><p>Click the <strong>Reset</strong> button to clear the current experiment and run the simulation again with a new input.</p>
           </li>
           </ol>
           
           </div>
           <div class="bug-report-mobile">
-              <bug-report id="bug-report" title="[BUG REPORT] DIVIDE &amp; CONQUER STRATEGIES I: SORTING (MERGESORT &amp; QUICKSORT)" page-type="text" context-info="{&quot;organisation&quot;:&quot;Virtual Labs&quot;,&quot;expname&quot;:&quot;DIVIDE &amp; CONQUER STRATEGIES I: SORTING (MERGESORT &amp; QUICKSORT)&quot;}" checkbox-json="{&quot;text&quot;:[&quot;Insufficient Content&quot;],&quot;video&quot;:[&quot;Insufficient Content&quot;],&quot;assesment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;assessment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;simulation&quot;:[&quot;Simulation Not Working&quot;,&quot;Incorrect Results/Observations&quot;,&quot;Insufficient/Incorrect Instructions&quot;],&quot;DEFAULT&quot;:[&quot;Page Not Loading&quot;,&quot;Content Not Visible&quot;,&quot;Incorrect Content&quot;]}" position="override" button_style="
+              <bug-report id="bug-report" title="[BUG REPORT] DIVIDE AND CONQUER APPROACH: CLOSEST PAIR OF POINTS IN 2D EUCLIDEAN SPACE" page-type="text" context-info="{&quot;organisation&quot;:&quot;Virtual Labs&quot;,&quot;expname&quot;:&quot;DIVIDE AND CONQUER APPROACH: CLOSEST PAIR OF POINTS IN 2D EUCLIDEAN SPACE&quot;}" checkbox-json="{&quot;text&quot;:[&quot;Insufficient Content&quot;],&quot;video&quot;:[&quot;Insufficient Content&quot;],&quot;assesment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;assessment&quot;:[&quot;Incorrect Options&quot;,&quot;Incorrect Answer&quot;,&quot;Incorrect Question&quot;],&quot;simulation&quot;:[&quot;Simulation Not Working&quot;,&quot;Incorrect Results/Observations&quot;,&quot;Insufficient/Incorrect Instructions&quot;],&quot;DEFAULT&quot;:[&quot;Page Not Loading&quot;,&quot;Content Not Visible&quot;,&quot;Incorrect Content&quot;]}" position="override" button_style="
                           position: fixed; 
                           bottom: 20px;
                           right: 20px;

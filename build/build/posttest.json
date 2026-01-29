@@ -2,89 +2,174 @@
   "version": 2.0,
   "questions": [
     {
-      "question": "Which of the following sorting algorithms always divides the array into two equal halves?",
+      "question": "In the divide-and-conquer algorithm, what does delta = min(deltaL, deltaR) represent?",
       "answers": {
-        "a": "Quick Sort",
-        "b": "Merge Sort",
-        "c": "Bubble Sort",
-        "d": "Insertion Sort"
+        "a": "Distance between midpoints",
+        "b": "Maximum possible distance",
+        "c": "Minimum distance found in left and right halves",
+        "d": "Width of the entire plane"
       },
       "explanations": {
-        "a": "Quick Sort division depends on pivot selection and may be unbalanced.",
-        "b": "Merge Sort always splits the array into two equal or nearly equal halves.",
-        "c": "Bubble Sort does not divide the array.",
-        "d": "Insertion Sort processes elements sequentially."
-      },
-      "correctAnswer": "b",
-      "difficulty": "beginner"
-    },
-    {
-      "question": "In Merge Sort, the array is recursively divided until each subarray contains:",
-      "answers": {
-        "a": "Two elements",
-        "b": "Three elements",
-        "c": "One element",
-        "d": "Zero elements"
-      },
-      "explanations": {
-        "a": "Division continues beyond two elements.",
-        "b": "Merge Sort does not stop at three elements.",
-        "c": "A single element is considered already sorted.",
-        "d": "Subarrays never contain zero elements."
+        "a": "Midpoints do not determine the minimum distance.",
+        "b": "We are looking for the minimum, not maximum.",
+        "c": "Delta is the minimum distance discovered in either the left sub-problem or the right sub-problem.",
+        "d": "Width of the plane is independent of point distribution."
       },
       "correctAnswer": "c",
       "difficulty": "beginner"
     },
     {
-      "question": "In Quick Sort using the Median of Three approach, the pivot is selected as the median of which elements?",
+      "question": "Which case represents the worst-case input distribution for the Closest Pair algorithm?",
       "answers": {
-        "a": "First, second, and last",
-        "b": "First, middle, and last",
-        "c": "Middle three elements",
-        "d": "Random three elements"
+        "a": "Random distribution",
+        "b": "Clustered points",
+        "c": "Collinear points",
+        "d": "Uniform grid"
       },
       "explanations": {
-        "a": "The second element is not part of the Median-of-Three method.",
-        "b": "Median of first, middle, and last helps avoid worst-case partitions.",
-        "c": "The algorithm does not choose three middle elements.",
-        "d": "Median-of-Three is deterministic, not random."
+        "a": "Random distributions usually don't saturate the strip check.",
+        "b": "Clustered points are often solved quickly in recursion.",
+        "c": "Points as a line (collinear) can lead to more points falling into the strip check zone.",
+        "d": "Uniform grids are predictable and well-balanced."
       },
-      "correctAnswer": "b",
-      "difficulty": "beginner"
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
     },
     {
-      "question": "Why does the Median of Three technique improve Quick Sort performance?",
+      "question": "Which case typically results in fewer strip comparisons during the merging step?",
       "answers": {
-        "a": "It reduces recursion depth",
-        "b": "It avoids selecting extreme pivot values",
-        "c": "It eliminates swapping",
-        "d": "It removes recursion"
+        "a": "Collinear points",
+        "b": "Clustered points",
+        "c": "Random distribution",
+        "d": "Equidistant points"
       },
       "explanations": {
-        "a": "Reduced recursion depth is a result, not the main goal.",
-        "b": "Balanced pivot selection prevents highly unbalanced partitions.",
-        "c": "Swapping is still required in Quick Sort.",
-        "d": "Quick Sort always uses recursion."
+        "a": "Collinear points may crowd the strip.",
+        "b": "When points are clustered far from the median, very few enter the strip check area.",
+        "c": "Random points have a moderate chance of entering the strip.",
+        "d": "Equidistant points might have many points near the threshold."
       },
       "correctAnswer": "b",
-      "difficulty": "beginner"
+      "difficulty": "intermediate"
     },
     {
-      "question": "In the Median-of-Three technique, once arr[left] ≤ arr[center] ≤ arr[right] is ensured, where is the median element usually moved in the array?",
+      "question": "What is the overall time complexity of the Divide and Conquer Closest Pair algorithm?",
       "answers": {
-        "a": "At the first index (left)",
-        "b": "At the middle index",
-        "c": "At the second last index (right − 1)",
-        "d": "At the last index (right)"
+        "a": "O(n²)",
+        "b": "O(n)",
+        "c": "O(log n)",
+        "d": "O(n log n)"
       },
       "explanations": {
-        "a": "The first index is not used as the pivot position.",
-        "b": "The median is not kept in the middle for partitioning.",
-        "c": "The median is moved to right − 1 to act as the pivot during partitioning.",
-        "d": "The last index is reserved as a boundary element."
+        "a": "This is the complexity of Brute Force.",
+        "b": "Linear time is insufficient for this spatial partitioning problem.",
+        "c": "Log n is only the depth of the recursive tree.",
+        "d": "Combining O(n log n) sorting and O(n) merging across log n levels results in O(n log n)."
+      },
+      "correctAnswer": "d",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "Why does the Divide and Conquer approach scale better than brute force as n increases?",
+      "answers": {
+        "a": "It avoids recursion",
+        "b": "It reduces distance computations using spatial constraints",
+        "c": "It uses a faster distance formula",
+        "d": "It processes points in parallel"
+      },
+      "explanations": {
+        "a": "It heavily uses recursion.",
+        "b": "By dividing the plane, it eliminates the need to compare every point with every other point.",
+        "c": "It uses the same Euclidean distance formula.",
+        "d": "While possible, the base algorithm is sequential; it scales due to reduced operations."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "For which input size is the brute force method still practically acceptable?",
+      "answers": {
+        "a": "Very large datasets",
+        "b": "Only clustered data",
+        "c": "Small input sizes (n <= 10 or 20)",
+        "d": "Worst-case distributions"
+      },
+      "explanations": {
+        "a": "Large datasets make n² extremely slow.",
+        "b": "Clustered data still requires all-pair checks in brute force.",
+        "c": "For very small n, the overhead of recursion in Divide and Conquer may exceed brute force costs.",
+        "d": "Worst-case distributions make brute force even more painful."
       },
       "correctAnswer": "c",
       "difficulty": "beginner"
+    },
+    {
+      "question": "The 'Divide' step in the algorithm reduces the problem size by:",
+      "answers": {
+        "a": "Exactly one point",
+        "b": "Approximately half",
+        "c": "Square root of n",
+        "d": "Logarithm of n"
+      },
+      "explanations": {
+        "a": "Reducing by one point is used in simple recursive brute force, not D&C.",
+        "b": "We divide the points into two equal (or nearly equal) halves by the median.",
+        "c": "Square root division is for different types of algorithms.",
+        "d": "Logarithm describes the number of divisions, not the remaining size."
+      },
+      "correctAnswer": "b",
+      "difficulty": "beginner"
+    },
+    {
+      "question": "Which of these is NOT an essential part of the optimized Closest Pair algorithm?",
+      "answers": {
+        "a": "Sorting by X-coordinate",
+        "b": "Recursive calls to sub-problems",
+        "c": "Calculating distance to the origin for every point",
+        "d": "Checking points within the vertical strip"
+      },
+      "explanations": {
+        "a": "Sorting is required to define the median line.",
+        "b": "Recursion is the heart of Divide and Conquer.",
+        "c": "Proximity to the origin is irrelevant to the distance between two points.",
+        "d": "Strip check is necessary to find pairs crossing the division line."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "If n=1000, approximately how many comparisons does a Brute Force algorithm perform?",
+      "answers": {
+        "a": "1,000",
+        "b": "10,000",
+        "c": "500,000",
+        "d": "1,000,000"
+      },
+      "explanations": {
+        "a": "1,000 is just n.",
+        "b": "10,000 is 10n.",
+        "c": "Using [n * (n-1)] / 2: [1000 * 999] / 2 = 499,500 ≈ 500,000.",
+        "d": "1,000,000 is n²."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "After sorting by X, how is the median vertical line typically determined?",
+      "answers": {
+        "a": "At X = 0",
+        "b": "At the average of all X-coordinates",
+        "c": "At the X-coordinate of the middle point in the sorted list",
+        "d": "At the maximum X-coordinate"
+      },
+      "explanations": {
+        "a": "The origin may not be anywhere near the points.",
+        "b": "Average can be skewed by outliers; median ensures equal point counts.",
+        "c": "The median X-coordinate of the sorted array provides the most balanced split.",
+        "d": "The maximum would not divide the points."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
     }
   ]
 }
