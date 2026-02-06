@@ -1,65 +1,74 @@
-### User Input
+### Procedure
 
-1. Select the desired sorting algorithm from the dropdown menu:
+1. Open the **Merge Sort and Quick Sort – Divide & Conquer Simulation** experiment.
+2. From the **Algorithm** dropdown menu, select the sorting algorithm to be analyzed:
    - Merge Sort
-   - Quick Sort 
+   - Quick Sort(Median-of-Three) 
 
-2. Adjust the value of **N** (number of elements in the array) using the slider provided.
+3. Adjust the value of **N** (number of elements in the array) using the slider or input control provided.
 
-3. Select the type of input array from the dropdown menu:
-   - Randomly generated array
+4. Select the Input Array Type from the dropdown menu:
+   - Random array
    - Already sorted array (ascending order)
    - Already sorted array (descending order)
 
-4. Click the **Run Simulation** button to generate the input array and initialize the selected sorting algorithm.
+5. Click the **Run Simulation** button.
+      a. The selected input array is generated.
+      b. The algorithm is initialized.
+      c. The initial array is displayed in the    visualization area. 
 
----
+###  Simulation Execution
 
-### Calculations / Simulation Steps
+6. Observe the unsorted array before execution begins.
+7. Click the **Next →** button to execute the algorithm step-by-step.
+8. During each step, observe:
+   a. Comparisons between elements
+   b. Movement and swapping of elements
+   c. Placement of elements in their correct positions
+9. Click the **← Previous** button to revisit earlier steps and analyze the algorithm’s behavior in detail.
+10. Click the **Auto Play** button to automatically execute all remaining steps.
+11. Select the execution speed (**Slow / Normal / Fast**) using the speed dropdown next to Auto Play.
 
-1. Click the **Next** button to execute the sorting algorithm step-by-step.
+### Algorithm-Specific Observations
 
-2. Observe the comparison, movement, and placement of elements at each step of the algorithm.
+**During Merge Sort Execution**
 
-3. During **Merge Sort** execution, observe the following:
-   - Recursive splitting of the array into smaller subarrays
-   - Merging of subarrays in sorted order based on element comparison
+12. Observe the following:
+   a. Recursive division of the array into smaller subarrays
+   b. Splitting until single-element subarrays are obtained
+   c. Merging of subarrays in sorted order based on comparisons
+   d. Gradual formation of the final sorted array
+**During Quick Sort (Median-of-Three) Execution**
 
-4. During **Quick Sort (Median-of-Three)** execution, observe the following:
-   - Selection of the pivot using the Median-of-Three method
-   - Movement of pointer **i** from left to right
-   - Movement of pointer **j** from right to left
-   - Swapping of elements when misplaced values are detected
-   - Placement of the pivot element at its correct sorted position after pointer crossing
+13. Observe the following:
+   a. Selection of the pivot using the Median-of-Three method (first element, middle element, last element)
+   b. Movement of pointer i from left to right
+   c. Movement of pointer j from right to left
+   d. Swapping of elements when misplaced values are detected
+   e. Placement of the pivot element at its f. correct sorted position
+   f. Recursive sorting of left and right subarrays
 
-5. Click the **Previous** button to revisit earlier steps and analyze the algorithm’s behavior in detail.
+### Runtime Analysis
 
-6. Click the **Auto-Run** button to automatically execute all remaining steps until the sorting process is completed.
+14. Observe the Algorithm Steps / Step Log panel:
+   a. Each comparison and swap is logged
+   b. The current array state is shown after every step
+15. Monitor the runtime metrics displayed during execution:
+   -Number of comparisons
+   -Execution time
 
----
+### Advanced Analysis (Performance Comparison)
 
-### Scalability Analysis (Graph Visualization)
+16. Click the **Advanced Analysis** button.
+17. Select the maximum input size **N** for scalability analysis.
+18. Click **Run Analysis**.
+   a. The system executes the algorithm for multiple input sizes.
+   b. Execution time is measured for each input size.
+19. Observe the graph of **Input Size (n) vs Execution Time (ms)**.
+20. Analyze:
+   a. Average-case behavior of Quick Sort (O(n log n))
+   b. Consistent performance of Merge Sort (O(n log n))
+   c. Practical differences in scalability between the two algorithms
 
-1. After completing the simulation, click the **Scalability Graph** option.
-
-2. Select the maximum input size **N** from the dropdown menu.
-
-3. The system automatically generates multiple input sizes up to the selected **N** and measures the execution time for each.
-
-4. Observe the plotted graph of **Input Size (n)** versus **Execution Time (ms)**.
-
-5. Analyze how the execution time increases with respect to input size for the selected algorithm.
-
----
-
-### Results
-
-1. Observe the **final sorted array** displayed after completion of the simulation.
-
-2. Analyze the **Step Log**, which records each operation performed by the algorithm along with the corresponding array state.
-
-3. Study the **Scalability Graph analysis**, which highlights:
-   - Growth of execution time with increasing input size
-   - Average-case behavior of Quick Sort (O(n log n))
-   - Consistent performance of Merge Sort (O(n log n))
-   - Practical differences in scalability between the two algorithms
+### Reset
+21. Click the **Reset** button to clear the current simulation and repeat the experiment with a different algorithm, input size, or input type.

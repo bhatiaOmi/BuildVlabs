@@ -1,14 +1,14 @@
 {
   _: [],
   f: [
-    'c:\\Users\\omika\\OneDrive\\Desktop\\VLab_Experiment_3\\ph3-exp-template\\experiment-descriptor.json'
+    'c:\\Users\\omika\\Downloads\\Exp3_Divide\\ph3-exp-template\\experiment-descriptor.json'
   ],
   files: [
-    'c:\\Users\\omika\\OneDrive\\Desktop\\VLab_Experiment_3\\ph3-exp-template\\experiment-descriptor.json'
+    'c:\\Users\\omika\\Downloads\\Exp3_Divide\\ph3-exp-template\\experiment-descriptor.json'
   ],
   '$0': 'validate'
 }
 Json Error: There are additional properties
 Json Error: must match "then" schema
-Failed while validating c:\Users\omika\OneDrive\Desktop\VLab_Experiment_3\ph3-exp-template\experiment-descriptor.json
+Failed while validating c:\Users\omika\Downloads\Exp3_Divide\ph3-exp-template\experiment-descriptor.json
 Error: Schema is Invalid
