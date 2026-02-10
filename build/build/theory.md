@@ -1,5 +1,3 @@
-## Theory
-
 ### Introduction
 
 Sorting is a fundamental operation in computer science that involves arranging elements of a dataset in a specified order, typically in ascending or descending order. Efficient sorting is essential because many operations such as searching, indexing, data analysis, and optimization perform significantly faster on sorted data.
