@@ -4,10 +4,8 @@ const algoSelect = $('algoSelect'), arrayType = $('arrayType'), runBtn = $('runB
 const autoRunBtn = $('autoRun'), originalArrayEl = $('originalArray');
 const stepIndex = $('stepIndex'), stepTotal = $('stepTotal'), prevStep = $('prevStep'), nextStep = $('nextStep');
 const pseudoContainer = $('pseudoContainer'), factsText = $('factsText'), nRange = $('nRange'), nValue = $('nValue');
-const speedMenu = $('speedMenu'), advancedAnalysisBox = $('advancedAnalysisBox'), advancedBtn = $('advancedBtn');
+const speedMenu = $('speedMenu');
 const customInputContainer = $('customInputContainer'), customArrayInput = $('customArrayInput');
-const overlay = $('graphOverlay'), modal = $('graphModal'), closeBtn = $('closeGraphBtn');
-const inputSizeDropdown = $('inputSizeDropdown'), canvas = $('scalabilityCanvas'), graphMessage = $('graphMessage');
 const treeContainer = $('treeContainer'), treeCanvas = $('treeCanvas');
 const opDetail = $('opDetail'), opLabel = $('opLabel'), opCells = $('opCells');
 const speedButtons = speedMenu.querySelectorAll('button');
@@ -17,19 +15,43 @@ let selectedAlgoName = '';
 
 const PSEUDO_CODE = {
   merge: [
-    "function mergeSort(arr)",
-    "  if length <= 1: return arr",
-    "  mid = floor(length / 2)",
-    "  L = mergeSort(leftHalf)",
-    "  R = mergeSort(rightHalf)",
-    "  return merge(L, R)"
+    "function mergeSort(A)",
+    "    if size(A) ≤ 1",
+    "        return A                        // BASE CASE",
+    "    mid ← floor(size(A) / 2)",
+    "    left  ← mergeSort(A[0 … mid-1])     // DIVIDE (left)",
+    "    right ← mergeSort(A[mid … end])     // DIVIDE (right)",
+    "    return merge(left, right)           // MERGE",
+    "",
+    "function merge(L, R)",
+    "    result ← empty list",
+    "    while L and R are not empty",
+    "        if L[0] ≤ R[0]",
+    "            move L[0] → result          // COMPARE & MOVE",
+    "        else",
+    "            move R[0] → result",
+    "    append remaining L or R to result",
+    "    return result"
   ],
   quick: [
-    "function quickSort(arr, l, r)",
-    "  if l >= r: return",
-    "  p = partition(arr, l, r)",
-    "  quickSort(arr, l, p - 1)",
-    "  quickSort(arr, p + 1, r)"
+    "function quickSort(A, l, r)",
+    "    if l ≥ r",
+    "        return                          // BASE CASE",
+    "    p ← partitionMedian3(A, l, r)       // PARTITION",
+    "    quickSort(A, l, p - 1)              // LEFT SUBARRAY",
+    "    quickSort(A, p + 1, r)              // RIGHT SUBARRAY",
+    "",
+    "function partitionMedian3(A, l, r)",
+    "    m ← floor((l + r) / 2)",
+    "    pivot ← median(A[l], A[m], A[r])    // CHOOSE PIVOT",
+    "    swap pivot with A[r - 1]             // pivot at end-1",
+    "    i ← l",
+    "    for j ← l to r - 2",
+    "        if A[j] < pivot",
+    "            swap A[i], A[j]              // SWAP",
+    "            i ← i + 1",
+    "    swap A[i], A[r - 1]                  // FINAL PIVOT PLACE",
+    "    return i"
   ]
 };
 
@@ -40,7 +62,8 @@ function renderPseudocode(algo) {
     const div = document.createElement('div');
     div.className = 'pseudo-line';
     div.dataset.line = i + 1;
-    div.innerHTML = `<span class="pseudo-arrow">➤</span><span class="ln">${i + 1}.</span> ${line}`;
+    // Render with original spaces, use nbsp for leading spaces if needed, or just white-space: pre
+    div.innerHTML = `<span class="pseudo-arrow">➤</span><span class="ln">${i + 1}</span><span class="pseudo-content">${line || '&nbsp;'}</span>`;
     pseudoContainer.appendChild(div);
   });
 }
@@ -52,6 +75,8 @@ nRange.addEventListener('input', () => { nValue.textContent = nRange.value });
 
 algoSelect.addEventListener('change', () => {
   if (!algoSelect.value) return;
+  resetLeftPanel();
+  resetVisualization();
   selectedAlgoName = algoSelect.value === 'merge' ? 'Merge Sort' : 'Quick Sort';
   renderPseudocode(algoSelect.value);
   setFacts();
@@ -70,44 +95,44 @@ function mergeSortTrace(arr) {
   treeData = mkNode(arr);
   function rec(a, node) {
     steps.push({
-      type: 'split', desc: `Subarray: [${a.join(', ')}]`, tree: { node, phase: 'split' },
-      vis: { cells: a.map((v, i) => ({ val: v })), label: 'SUBARRAY' }, step: ++stepCounter
+      type: 'split', desc: `Split Subarray: [${a.join(', ')}]`, tree: { node, phase: 'split' },
+      vis: { cells: a.map((v, i) => ({ val: v })), label: 'Split Subarray' }, step: ++stepCounter
     });
     if (a.length <= 1) {
       node.merged = a.slice();
       steps.push({
-        type: 'base', desc: `Base case: [${a.join(', ')}]`, tree: { node, phase: 'base' },
-        vis: { cells: a.map(v => ({ val: v, cls: 'hl-placed', top: '✓' })), label: 'BASE CASE' }, step: ++stepCounter
+        type: 'base', desc: `Base Case: [${a.join(', ')}] is already sorted.`, tree: { node, phase: 'base' },
+        vis: { cells: a.map(v => ({ val: v, cls: 'hl-placed', top: '✓' })), label: 'Base Case: already sorted' }, step: ++stepCounter
       });
       return a;
     }
     const mid = Math.floor(a.length / 2), L = a.slice(0, mid), R = a.slice(mid);
     node.left = mkNode(L); node.right = mkNode(R);
-    // Divide step: left=blue, right=green
+
+    // Divide step: show split point clearly
     const dc = [];
-    for (let i = 0; i < mid; i++)dc.push({ val: a[i], cls: 'hl-left', top: i === 0 ? 'LEFT' : '' });
+    for (let i = 0; i < mid; i++) dc.push({ val: a[i], cls: 'hl-left', top: i === 0 ? 'Left' : '' });
     dc.push({ sep: '|' });
-    for (let i = mid; i < a.length; i++)dc.push({ val: a[i], cls: 'hl-right', top: i === mid ? 'RIGHT' : '' });
+    for (let i = mid; i < a.length; i++) dc.push({ val: a[i], cls: 'hl-right', top: i === mid ? 'Right' : '' });
     steps.push({
-      type: 'divide', desc: `Divide → Left [${L.join(', ')}] | Right [${R.join(', ')}]`,
-      tree: { node, phase: 'divide' }, vis: { cells: dc, label: 'DIVIDE' }, step: ++stepCounter
+      type: 'divide', desc: `Divide into Left [${L.join(', ')}] and Right [${R.join(', ')}]`,
+      tree: { node, phase: 'divide' }, vis: { cells: dc, label: 'Divide Step' }, step: ++stepCounter
     });
 
     const sL = rec(L, node.left), sR = rec(R, node.right);
 
-    // Merge start
+    // Merge start label
     const mc = [];
-    sL.forEach((v, i) => mc.push({ val: v, cls: 'hl-left', top: i === 0 ? 'LEFT' : '' }));
+    sL.forEach((v, i) => mc.push({ val: v, cls: 'hl-left', top: i === 0 ? 'Left' : '' }));
     mc.push({ sep: '+' });
-    sR.forEach((v, i) => mc.push({ val: v, cls: 'hl-right', top: i === 0 ? 'RIGHT' : '' }));
+    sR.forEach((v, i) => mc.push({ val: v, cls: 'hl-right', top: i === 0 ? 'Right' : '' }));
     steps.push({
-      type: 'merge-start', desc: `Merging [${sL.join(', ')}] and [${sR.join(', ')}]`,
-      tree: { node, phase: 'merge-start' }, vis: { cells: mc, label: 'MERGE' }, step: ++stepCounter
+      type: 'merge-start', desc: `Preparing to Merge [${sL.join(', ')}] and [${sR.join(', ')}]`,
+      tree: { node, phase: 'merge-start' }, vis: { cells: mc, label: 'Merge' }, step: ++stepCounter
     });
 
     const merged = []; let i = 0, j = 0;
     while (i < sL.length && j < sR.length) {
-      comparisonCount++;
       const cc = [];
       sL.forEach((v, k) => cc.push({ val: v, cls: k === i ? 'hl-compare' : '', top: k === i ? 'i' : '' }));
       cc.push({ sep: 'vs' });
@@ -115,29 +140,30 @@ function mergeSortTrace(arr) {
       if (merged.length) { cc.push({ sep: '→' }); merged.forEach(v => cc.push({ val: v, cls: 'hl-placed' })) }
       steps.push({
         type: 'compare', desc: `Compare ${sL[i]} vs ${sR[j]}`,
-        tree: { node, phase: 'merging' }, vis: { cells: cc, label: 'COMPARE' }, step: ++stepCounter
+        tree: { node, phase: 'merging' }, vis: { cells: cc, label: 'Compare' }, step: ++stepCounter
       });
       if (sL[i] <= sR[j]) merged.push(sL[i++]); else merged.push(sR[j++]);
-      // Place step
+
+      // Placed step
       const pc = [];
       sL.forEach((v, k) => pc.push({ val: v, cls: k === i ? 'hl-compare' : '', top: k === i ? 'i' : '' }));
       pc.push({ sep: '+' });
       sR.forEach((v, k) => pc.push({ val: v, cls: k === j ? 'hl-compare' : '', top: k === j ? 'j' : '' }));
       pc.push({ sep: '→' }); merged.forEach(v => pc.push({ val: v, cls: 'hl-placed' }));
       steps.push({
-        type: 'place', desc: `Placed ${merged[merged.length - 1]} into merged array`,
-        tree: { node, phase: 'merging' }, vis: { cells: pc, label: 'PLACING' }, step: ++stepCounter
+        type: 'place', desc: `Placed ${merged[merged.length - 1]} into merged result`,
+        tree: { node, phase: 'merging' }, vis: { cells: pc, label: 'Merged' }, step: ++stepCounter
       });
     }
     while (i < sL.length) merged.push(sL[i++]);
     while (j < sR.length) merged.push(sR[j++]);
     node.merged = merged.slice();
-    for (let k = 0; k < merged.length; k++)a[k] = merged[k];
+    for (let k = 0; k < merged.length; k++) a[k] = merged[k];
 
     steps.push({
-      type: 'merge-done', desc: `Merged result → [${merged.join(', ')}]`,
+      type: 'merge-done', desc: `Merged Subarray Result → [${merged.join(', ')}]`,
       tree: { node, phase: 'merged' },
-      vis: { cells: merged.map(v => ({ val: v, cls: 'hl-placed', top: '' })), label: 'MERGED RESULT' }, step: ++stepCounter
+      vis: { cells: merged.map(v => ({ val: v, cls: 'hl-placed' })), label: 'Sorted' }, step: ++stepCounter
     });
     return merged;
   }
@@ -150,15 +176,23 @@ function quickSortTrace(arr) {
   function rec(a, l, r, node) {
     const sub = a.slice(l, r + 1);
     steps.push({
-      type: 'q-split', desc: `QuickSort on [${sub.join(', ')}]`, tree: { node, phase: 'split' },
-      vis: { cells: sub.map(v => ({ val: v })), label: 'QUICKSORT SUBARRAY' }, step: ++stepCounter
+      type: 'q-split', desc: `Subarray to Sort: [${sub.join(', ')}]`, tree: { node, phase: 'split' },
+      vis: { cells: sub.map(v => ({ val: v })), label: 'Subarray' }, step: ++stepCounter
     });
     if (l > r) { node.merged = []; return }
     if (l === r) {
       node.merged = [a[l]];
+      // Pedagogical Requirement: show base case within array context
       steps.push({
-        type: 'base', desc: `Single element: ${a[l]}`, tree: { node, phase: 'base' },
-        vis: { cells: [{ val: a[l], cls: 'hl-placed', top: '✓' }], label: 'BASE CASE' }, step: ++stepCounter
+        type: 'base', desc: `Base Case: ${a[l]} is already sorted.`, tree: { node, phase: 'base' },
+        vis: {
+          cells: a.map((v, idx) => ({
+            val: v,
+            cls: idx === l ? 'hl-placed' : 'hl-dim',
+            top: idx === l ? 'Base ✓' : ''
+          })),
+          label: 'Base Case'
+        }, step: ++stepCounter
       });
       return;
     }
@@ -166,69 +200,67 @@ function quickSortTrace(arr) {
       if (a[l] > a[r]) {
         [a[l], a[r]] = [a[r], a[l]];
         steps.push({
-          type: 'swap', desc: `Swap ${a[r]} ↔ ${a[l]}`, tree: { node, phase: 'partition' },
-          vis: { cells: [{ val: a[l], cls: 'hl-swap', top: 'swap' }, { val: a[r], cls: 'hl-swap', top: 'swap' }], label: 'DIRECT SWAP' }, step: ++stepCounter
+          type: 'swap', desc: `Swap ${a[r]} ↔ ${a[l]} to sort pair`, tree: { node, phase: 'partition' },
+          vis: { cells: [{ val: a[l], cls: 'hl-swap', top: 'Swap' }, { val: a[r], cls: 'hl-swap', top: 'Swap' }], label: 'Swap' }, step: ++stepCounter
         });
       }
       node.merged = a.slice(l, r + 1);
       steps.push({
-        type: 'base', desc: `Sorted: [${a.slice(l, r + 1).join(', ')}]`, tree: { node, phase: 'base' },
-        vis: { cells: a.slice(l, r + 1).map(v => ({ val: v, cls: 'hl-placed' })), label: 'SORTED' }, step: ++stepCounter
+        type: 'base', desc: `Sorted Pair: [${a.slice(l, r + 1).join(', ')}]`, tree: { node, phase: 'base' },
+        vis: { cells: a.slice(l, r + 1).map(v => ({ val: v, cls: 'hl-placed' })), label: 'Sorted' }, step: ++stepCounter
       });
       return;
     }
 
-    // Median of three - labels ABOVE cells, no overlap
+    // Median of Three (M3) Selection
     const c = Math.floor((l + r) / 2);
     const motCells = a.slice(l, r + 1).map((v, k) => {
       const idx = k + l;
-      if (idx === l) return { val: v, cls: 'hl-left', top: `First [${l}]` };
-      if (idx === c) return { val: v, cls: 'hl-pivot', top: `Mid [${c}]` };
-      if (idx === r) return { val: v, cls: 'hl-right', top: `Last [${r}]` };
+      if (idx === l) return { val: v, cls: 'hl-left', top: 'First' };
+      if (idx === c) return { val: v, cls: 'hl-pivot', top: 'Mid' };
+      if (idx === r) return { val: v, cls: 'hl-right', top: 'Last' };
       return { val: v };
     });
     steps.push({
-      type: 'pivot-sel', desc: `Median-of-Three: arr[${l}]=${a[l]}, arr[${c}]=${a[c]}, arr[${r}]=${a[r]}`,
-      tree: { node, phase: 'partition' }, vis: { cells: motCells, label: 'PIVOT SELECTION — MEDIAN OF THREE' }, step: ++stepCounter
+      type: 'pivot-sel', desc: `Median-of-Three: first=${a[l]}, mid=${a[c]}, last=${a[r]}`,
+      tree: { node, phase: 'partition' }, vis: { cells: motCells, label: 'Pivot (M3)' }, step: ++stepCounter
     });
 
     if (a[l] > a[c]) [a[l], a[c]] = [a[c], a[l]];
     if (a[l] > a[r]) [a[l], a[r]] = [a[r], a[l]];
     if (a[c] > a[r]) [a[c], a[r]] = [a[r], a[c]];
-    [a[c], a[r - 1]] = [a[r - 1], a[c]];
+    [a[c], a[r - 1]] = [a[r - 1], a[c]]; // Move pivot to penultimate position
 
     const pi = r - 1, pv = a[pi];
     const pvCells = a.slice(l, r + 1).map((v, k) => {
-      if (k + l === pi) return { val: v, cls: 'hl-pivot', top: 'PIVOT' };
+      if (k + l === pi) return { val: v, cls: 'hl-pivot', top: 'Pivot' };
       return { val: v };
     });
     steps.push({
-      type: 'pivot', desc: `Pivot = ${pv} (placed at index ${pi})`, tree: { node, phase: 'partition' },
-      vis: { cells: pvCells, label: `PIVOT SELECTED: ${pv}` }, step: ++stepCounter
+      type: 'pivot', desc: `Pivot Selected: ${pv}. All partitioning will be around this value.`, tree: { node, phase: 'partition' },
+      vis: { cells: pvCells, label: 'Pivot Selected' }, step: ++stepCounter
     });
 
     let i = l + 1, j = r - 2;
     while (true) {
       while (i <= j && a[i] < pv) {
-        comparisonCount++;
         steps.push({
-          type: 'moveP', desc: `i moves right → i=${i} (${a[i]} < pivot ${pv})`, tree: { node, phase: 'partition' },
-          vis: { cells: mkQSCells(a, l, r, pi, i, j, 'i'), label: `SCANNING i→  (${a[i]} < ${pv})` }, step: ++stepCounter
+          type: 'moveP', desc: `i moves right: ${a[i]} < pivot ${pv}`, tree: { node, phase: 'partition' },
+          vis: { cells: mkQSCells(a, l, r, pi, i, j, 'i'), label: 'Compare' }, step: ++stepCounter
         });
         i++;
       }
       while (i <= j && a[j] > pv) {
-        comparisonCount++;
         steps.push({
-          type: 'moveQ', desc: `j moves left ← j=${j} (${a[j]} > pivot ${pv})`, tree: { node, phase: 'partition' },
-          vis: { cells: mkQSCells(a, l, r, pi, i, j, 'j'), label: `SCANNING ←j  (${a[j]} > ${pv})` }, step: ++stepCounter
+          type: 'moveQ', desc: `j moves left: ${a[j]} > pivot ${pv}`, tree: { node, phase: 'partition' },
+          vis: { cells: mkQSCells(a, l, r, pi, i, j, 'j'), label: 'Compare' }, step: ++stepCounter
         });
         j--;
       }
       if (i < j) {
         steps.push({
-          type: 'swap', desc: `Swap arr[${i}]=${a[i]} ↔ arr[${j}]=${a[j]}`, tree: { node, phase: 'partition' },
-          vis: { cells: mkQSCells(a, l, r, pi, i, j, 'swap'), label: `SWAP indices ${i} and ${j}` }, step: ++stepCounter
+          type: 'swap', desc: `Swap arr[${i}]=${a[i]} and arr[${j}]=${a[j]}`, tree: { node, phase: 'partition' },
+          vis: { cells: mkQSCells(a, l, r, pi, i, j, 'swap'), label: 'Swap' }, step: ++stepCounter
         });
         [a[i], a[j]] = [a[j], a[i]];
         i++; j--;
@@ -237,36 +269,37 @@ function quickSortTrace(arr) {
 
     [a[pi], a[i]] = [a[i], a[pi]];
     const fpCells = a.slice(l, r + 1).map((v, k) => {
-      if (k + l === i) return { val: v, cls: 'hl-pivot', top: 'PIVOT ✓' };
+      if (k + l === i) return { val: v, cls: 'hl-pivot', top: 'Pivot ✓' };
       return { val: v };
     });
     steps.push({
-      type: 'pivot-place', desc: `Pivot ${pv} placed at final position ${i}`, tree: { node, phase: 'partition' },
-      vis: { cells: fpCells, label: `PIVOT ${pv} AT FINAL POSITION` }, step: ++stepCounter
+      type: 'pivot-place', desc: `Pivot ${pv} is placed at its final sorted position ${i}`, tree: { node, phase: 'partition' },
+      vis: { cells: fpCells, label: 'Pivot Positioned' }, step: ++stepCounter
     });
 
     const leftSub = a.slice(l, i), rightSub = a.slice(i + 1, r + 1);
     node.left = mkNode(leftSub); node.right = mkNode(rightSub);
 
     const splitCells = [];
-    leftSub.forEach((v, k) => splitCells.push({ val: v, cls: 'hl-left', top: k === 0 ? 'LEFT' : '' }));
-    splitCells.push({ val: pv, cls: 'hl-pivot', top: 'P' });
-    rightSub.forEach((v, k) => splitCells.push({ val: v, cls: 'hl-right', top: k === 0 ? 'RIGHT' : '' }));
+    leftSub.forEach((v, k) => splitCells.push({ val: v, cls: 'hl-left', top: k === 0 ? 'Left' : '' }));
+    splitCells.push({ val: pv, cls: 'hl-pivot', top: 'Pivot' });
+    rightSub.forEach((v, k) => splitCells.push({ val: v, cls: 'hl-right', top: k === 0 ? 'Right' : '' }));
     steps.push({
-      type: 'divide', desc: `Divide: [${leftSub.join(', ')}] | ${pv} | [${rightSub.join(', ')}]`, tree: { node, phase: 'divide' },
-      vis: { cells: splitCells, label: 'DIVIDE AROUND PIVOT' }, step: ++stepCounter
+      type: 'partition-done', desc: `Partition Done: [${leftSub.join(', ')}] | ${pv} | [${rightSub.join(', ')}]`, tree: { node, phase: 'divide' },
+      vis: { cells: splitCells, label: 'Partition' }, step: ++stepCounter
     });
 
     rec(a, l, i - 1, node.left);
     rec(a, i + 1, r, node.right);
     node.merged = a.slice(l, r + 1);
     steps.push({
-      type: 'combine', desc: `Combined: [${node.merged.join(', ')}]`, tree: { node, phase: 'merged' },
-      vis: { cells: node.merged.map(v => ({ val: v, cls: 'hl-placed' })), label: 'COMBINED' }, step: ++stepCounter
+      type: 'combine', desc: `Combined sorted partitions: [${node.merged.join(', ')}]`, tree: { node, phase: 'merged' },
+      vis: { cells: node.merged.map(v => ({ val: v, cls: 'hl-placed' })), label: 'Sorted' }, step: ++stepCounter
     });
   }
   rec(arr, 0, arr.length - 1, treeData);
 }
+
 
 function mkQSCells(a, l, r, pi, i, j, mode) {
   return a.slice(l, r + 1).map((v, k) => {
@@ -312,99 +345,170 @@ function getTreeState(upTo) {
   return { states: m, active: act };
 }
 
-// Map phase to a descriptive tag label and CSS class
-function phaseToTag(phase) {
-  switch (phase) {
-    case 'split': return { cls: 'ph-split', text: 'SPLIT' };
-    case 'divide': return { cls: 'ph-split', text: 'DIVIDE' };
-    case 'partition': return { cls: 'ph-partition', text: 'PARTITION' };
-    case 'merge-start': return { cls: 'ph-merge', text: 'MERGING' };
-    case 'merging': return { cls: 'ph-compare', text: 'COMPARING' };
-    case 'merged': return { cls: 'ph-sorted', text: 'SORTED ✓' };
-    case 'base': return { cls: 'ph-sorted', text: 'SORTED ✓' };
-    default: return { cls: 'ph-split', text: phase.toUpperCase() };
+// Map phase to descriptive tag — algorithm-aware
+function phaseToTag(phase, algo) {
+  if (algo === 'merge') {
+    switch (phase) {
+      case 'split': return { cls: 'ph-split', text: 'Split' };
+      case 'divide': return { cls: 'ph-split', text: 'Divide Array' };
+      case 'merge-start': return { cls: 'ph-merge', text: 'Merge' };
+      case 'merging': return { cls: 'ph-compare', text: 'Compare' };
+      case 'merge-done': return { cls: 'ph-sorted', text: 'Merge Result' };
+      case 'merged': return { cls: 'ph-sorted', text: 'Merge Result' };
+      case 'base': return { cls: 'ph-sorted', text: 'Base Case' };
+      default: return { cls: 'ph-split', text: 'Split' };
+    }
+  } else {
+    switch (phase) {
+      case 'split': return { cls: 'ph-split', text: 'Subarray' };
+      case 'divide': return { cls: 'ph-split', text: 'Divide Around Pivot' };
+      case 'partition': return { cls: 'ph-partition', text: 'Partition (Pivot M3)' };
+      case 'merge-start': return { cls: 'ph-merge', text: 'Combine' };
+      case 'merging': return { cls: 'ph-compare', text: 'Compare' };
+      case 'merged': return { cls: 'ph-sorted', text: 'Sorted' };
+      case 'combine': return { cls: 'ph-sorted', text: 'Sorted' };
+      case 'base': return { cls: 'ph-sorted', text: 'Base Case' };
+      default: return { cls: 'ph-split', text: 'Subarray' };
+    }
   }
+}
+
+function nodeWidth(len) {
+  return Math.max(len, 1) * 36; // 36 = cell width
 }
 
 function renderTree(upTo) {
   treeCanvas.innerHTML = '';
-
-  // Algo heading inside tree
   if (selectedAlgoName) {
     const h = document.createElement('div'); h.className = 'tree-heading';
-    h.textContent = selectedAlgoName;
-    treeCanvas.appendChild(h);
+    h.textContent = selectedAlgoName; treeCanvas.appendChild(h);
   }
-
   if (!treeData) { const ph = document.createElement('div'); ph.className = 'tree-placeholder'; ph.textContent = 'Generate array and step through'; treeCanvas.appendChild(ph); return }
   const { states, active } = getTreeState(upTo);
-  const levels = []; let q = [treeData];
-  while (q.length) {
-    const lv = []; const nq = [];
-    for (const n of q) { if (states.has(n)) { lv.push(n); if (n.left && states.has(n.left)) nq.push(n.left); if (n.right && states.has(n.right)) nq.push(n.right) } }
-    if (lv.length) levels.push(lv); q = nq
-  }
-  if (!levels.length) { const ph = document.createElement('div'); ph.className = 'tree-placeholder'; ph.textContent = 'Step through to build tree'; treeCanvas.appendChild(ph); return }
+  if (!states.size) { const ph = document.createElement('div'); ph.className = 'tree-placeholder'; ph.textContent = 'Step through to build tree'; treeCanvas.appendChild(ph); return }
+  const algo = algoSelect.value;
 
-  const tot = levels.length;
-  levels.forEach((lv, li) => {
-    // Arrows
-    if (li > 0) {
+  // BFS on FULL tree structure (includes unvisited nodes for spacing)
+  const allLevels = []; let queue = [treeData];
+  while (queue.length) {
+    allLevels.push([...queue]);
+    const nq = [];
+    for (const n of queue) { if (n.left) nq.push(n.left); if (n.right) nq.push(n.right); }
+    queue = nq;
+  }
+
+  // ===== DIVIDE HALF — always shows node.arr, never merged =====
+  for (let i = 0; i < allLevels.length; i++) {
+    const level = allLevels[i];
+    if (!level.some(n => states.has(n))) break;
+    // Divide arrows ↙ ↘
+    if (i > 0) {
       const ad = document.createElement('div'); ad.className = 'tree-arrows-row';
-      const prev = levels[li - 1];
-      prev.forEach(p => {
+      allLevels[i - 1].forEach(p => {
         const hasL = p.left && states.has(p.left), hasR = p.right && states.has(p.right);
         if (hasL || hasR) {
           const g = document.createElement('span'); g.className = 'tree-arrow-pair';
-          g.style.minWidth = (p.arr.length * 36) + 'px'; g.style.justifyContent = 'center';
+          const w = Math.max(
+            p.left ? nodeWidth(p.left.arr.length) : 0,
+            p.right ? nodeWidth(p.right.arr.length) : 0
+          );
+          g.style.minWidth = w + 'px'; g.style.justifyContent = 'center';
           if (hasL) { const a = document.createElement('span'); a.textContent = '↙'; g.appendChild(a) }
           if (hasR) { const a = document.createElement('span'); a.textContent = '↘'; g.appendChild(a) }
           ad.appendChild(g);
         } else {
           const sp = document.createElement('span'); sp.className = 'tree-arrow-pair';
-          sp.style.minWidth = (p.arr.length * 36) + 'px'; sp.style.visibility = 'hidden';
+          sp.style.minWidth = nodeWidth(p.arr.length) + 'px'; sp.style.visibility = 'hidden';
           sp.textContent = '↙'; ad.appendChild(sp);
         }
       });
       treeCanvas.appendChild(ad);
     }
-    // Level
     const ld = document.createElement('div'); ld.className = 'tree-level';
-    lv.forEach(node => {
+    const visNodes = [];
+    level.forEach(node => {
+      if (!states.has(node)) {
+        const box = document.createElement('div'); box.className = 'tree-node'; box.style.visibility = 'hidden';
+        box.style.minWidth = nodeWidth(node.arr.length) + 'px';
+        node.arr.forEach(v => { const c = document.createElement('div'); c.className = 'tree-cell'; c.textContent = v; box.appendChild(c) });
+        ld.appendChild(box); return;
+      }
+      visNodes.push(node);
       const st = states.get(node);
       const box = document.createElement('div'); box.className = 'tree-node';
+      box.style.minWidth = nodeWidth(node.arr.length) + 'px';
       if (node === active) box.classList.add('active');
-      if (st === 'merged' || st === 'base') box.classList.add('merged');
-      const disp = (st === 'merged' || st === 'base') && node.merged ? node.merged : node.arr;
-      disp.forEach(v => { const c = document.createElement('div'); c.className = 'tree-cell'; c.textContent = v; box.appendChild(c) });
+      if (st === 'base') box.classList.add('merged');
+      node.arr.forEach(v => { const c = document.createElement('div'); c.className = 'tree-cell'; c.textContent = v; box.appendChild(c) });
       ld.appendChild(box);
     });
-    // Per-level tag: pick the most specific phase among nodes
-    if (tot > 1) {
-      // Get dominant phase for this level
-      const phases = lv.map(n => states.get(n));
-      // Priority: partition > merging > merge-start > divide > split > merged/base
-      let pick = phases[0];
-      const pri = ['base', 'merged', 'split', 'divide', 'merge-start', 'merging', 'partition'];
-      phases.forEach(p => { if (pri.indexOf(p) > pri.indexOf(pick)) pick = p });
-      const info = phaseToTag(pick);
+    // Phase tag — pick dominant phase, map merge phases back to divide context
+    if (visNodes.length && allLevels.length > 1) {
+      const phases = visNodes.map(n => states.get(n));
+      const mapped = phases.map(p => ['merged', 'combine', 'merge-start', 'merging', 'merge-done'].includes(p) ? 'divide' : p);
+      let pick = mapped[0];
+      const pri = ['base', 'split', 'divide', 'partition'];
+      mapped.forEach(p => { if (pri.indexOf(p) > pri.indexOf(pick)) pick = p });
+      const info = phaseToTag(pick, algo);
       const tag = document.createElement('span'); tag.className = 'phase-tag ' + info.cls;
-      tag.textContent = info.text;
-      ld.appendChild(tag);
+      tag.textContent = info.text; ld.appendChild(tag);
     }
     treeCanvas.appendChild(ld);
-  });
+  }
 
-  // Final result row
-  if (treeData.merged && states.get(treeData) === 'merged') {
+  // ===== MERGE HALF — shows node.merged, converging arrows ↘ ↙ =====
+  const mergeStart = allLevels.length > 1 ? allLevels.length - 2 : 0;
+  for (let i = mergeStart; i >= 0; i--) {
+    const level = allLevels[i];
+    if (!level.some(n => { const s = states.get(n); return s === 'merged' || s === 'base'; })) continue;
+    const isFinal = (i === 0);
+    // Converging arrows
     const ad = document.createElement('div'); ad.className = 'tree-arrows-row';
-    ad.innerHTML = '<span class="tree-arrow-pair"><span style="font-size:22px;color:#059669">⇩</span></span>';
+    level.forEach(p => {
+      const g = document.createElement('span'); g.className = 'tree-arrow-pair';
+      const w = Math.max(
+        p.left ? nodeWidth(p.left.arr.length) : 0,
+        p.right ? nodeWidth(p.right.arr.length) : 0
+      );
+      g.style.minWidth = w + 'px'; g.style.justifyContent = 'center';
+      const st = states.get(p); const done = st === 'merged' || st === 'base';
+      if (done && (p.left || p.right)) {
+        const a1 = document.createElement('span'); a1.textContent = '↘'; g.appendChild(a1);
+        const a2 = document.createElement('span'); a2.textContent = '↙'; g.appendChild(a2);
+      } else { g.style.visibility = 'hidden'; g.textContent = '·'; }
+      ad.appendChild(g);
+    });
     treeCanvas.appendChild(ad);
+    // Merged nodes row
     const ld = document.createElement('div'); ld.className = 'tree-level';
-    const box = document.createElement('div'); box.className = 'tree-node merged'; box.style.borderColor = '#059669'; box.style.borderWidth = '3px';
-    treeData.merged.forEach(v => { const c = document.createElement('div'); c.className = 'tree-cell'; c.style.color = '#059669'; c.style.fontWeight = '800'; c.textContent = v; box.appendChild(c) });
-    ld.appendChild(box);
-    const tag = document.createElement('span'); tag.className = 'phase-tag ph-final'; tag.textContent = 'FINAL RESULT ✓'; ld.appendChild(tag);
+    level.forEach(node => {
+      const st = states.get(node); const done = st === 'merged' || st === 'base';
+      const len = (node.merged || node.arr).length;
+      if (!done) {
+        const box = document.createElement('div'); box.className = 'tree-node'; box.style.visibility = 'hidden';
+        box.style.minWidth = nodeWidth(len) + 'px';
+        (node.merged || node.arr).forEach(v => { const c = document.createElement('div'); c.className = 'tree-cell'; c.textContent = v; box.appendChild(c) });
+        ld.appendChild(box); return;
+      }
+      const box = document.createElement('div'); box.className = 'tree-node merged';
+      box.style.minWidth = nodeWidth(len) + 'px';
+      if (node === active) box.classList.add('active');
+      if (isFinal) { box.style.borderColor = '#059669'; box.style.borderWidth = '3px'; }
+      (node.merged || node.arr).forEach(v => {
+        const c = document.createElement('div'); c.className = 'tree-cell'; c.textContent = v;
+        if (isFinal) { c.style.color = '#059669'; c.style.fontWeight = '800'; }
+        box.appendChild(c);
+      });
+      ld.appendChild(box);
+    });
+    const tag = document.createElement('span');
+    if (isFinal) {
+      tag.className = 'phase-tag ph-final'; tag.textContent = 'Sorted Array ✓';
+    } else {
+      const mergeLabel = algo === 'merge' ? 'Merge Result' : 'Sorted';
+      tag.className = 'phase-tag ph-sorted'; tag.textContent = mergeLabel;
+    }
+    ld.appendChild(tag);
     treeCanvas.appendChild(ld);
   }
 }
@@ -412,22 +516,35 @@ function renderTree(upTo) {
 // ===== SHOW STEP =====
 function highlightPseudo(stepType) {
   pseudoContainer.querySelectorAll('.pseudo-line').forEach(l => l.classList.remove('highlight'));
-  let lineToHighlight = 1;
+  let linesToHighlight = [1];
   const isMerge = algoSelect.value === 'merge';
 
   if (isMerge) {
-    if (['split', 'base'].includes(stepType)) lineToHighlight = 2;
-    else if (stepType === 'divide') lineToHighlight = 3;
-    else if (['merge-start', 'compare', 'place', 'merge-done'].includes(stepType)) lineToHighlight = 6;
+    if (stepType === 'split') linesToHighlight = [1];
+    else if (stepType === 'base') linesToHighlight = [2, 3];
+    else if (stepType === 'divide') linesToHighlight = [4, 5, 6];
+    else if (stepType === 'merge-start') linesToHighlight = [9, 11];
+    else if (['compare', 'place'].includes(stepType)) linesToHighlight = [13, 14, 15];
+    else if (stepType === 'merge-done') linesToHighlight = [9, 17];
   } else {
-    if (['q-split', 'base'].includes(stepType)) lineToHighlight = 2;
-    else if (['pivot-sel', 'pivot', 'moveP', 'moveQ', 'swap', 'pivot-place'].includes(stepType)) lineToHighlight = 3;
-    else if (stepType === 'divide') lineToHighlight = 4;
-    else if (stepType === 'combine') lineToHighlight = 5;
+    // Quick Sort lines (18 lines total)
+    if (stepType === 'q-split') linesToHighlight = [1];
+    else if (stepType === 'base') linesToHighlight = [2, 3];
+    else if (['pivot-sel', 'pivot'].includes(stepType)) linesToHighlight = [10, 11];
+    else if (['moveP', 'moveQ', 'swap'].includes(stepType)) linesToHighlight = [13, 14, 15, 16];
+    else if (stepType === 'pivot-place') linesToHighlight = [17];
+    else if (stepType === 'divide') linesToHighlight = [4];
+    else if (stepType === 'combine') linesToHighlight = [5, 6];
   }
 
-  const el = pseudoContainer.querySelector(`.pseudo-line[data-line="${lineToHighlight}"]`);
-  if (el) el.classList.add('highlight');
+  linesToHighlight.forEach(ln => {
+    const el = pseudoContainer.querySelector(`.pseudo-line[data-line="${ln}"]`);
+    if (el) {
+      el.classList.add('highlight');
+      // Scroll into view if not visible
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
 }
 
 function showStep(i, highlightHistory = true) {
@@ -440,7 +557,7 @@ function showStep(i, highlightHistory = true) {
 
   highlightPseudo(s.type);
 
-  if (s.type === 'done') { advancedAnalysisBox.classList.remove('hidden'); setFacts() }
+  if (s.type === 'done') { setFacts() }
 }
 
 function removeLastLog() {
@@ -468,7 +585,7 @@ runBtn.addEventListener('click', () => {
   renderPseudocode(algoSelect.value);
   steps = []; curStep = -1; stepCounter = 0; comparisonCount = 0;
   stepIndex.textContent = 0; stepTotal.textContent = 0;
-  advancedAnalysisBox.classList.add('hidden'); treeData = null;
+  treeData = null;
   opLabel.textContent = ''; opCells.innerHTML = '';
   selectedAlgoName = algoSelect.value === 'merge' ? 'Merge Sort' : 'Quick Sort';
   treeCanvas.innerHTML = '';
@@ -500,8 +617,9 @@ function stopAutoRun() {
 }
 
 function prepareSteps() {
-  steps = []; curStep = -1; stepCounter = 0; comparisonCount = 0;
+  steps = []; curStep = -1; stepCounter = 0;
   const arr = baseArray.slice();
+  comparisonCount = getComparisonCount(algoSelect.value, arr);
   if (algoSelect.value === 'merge') mergeSortTrace(arr);
   else if (algoSelect.value === 'quick') quickSortTrace(arr);
   steps.push({
@@ -511,19 +629,65 @@ function prepareSteps() {
   stepTotal.textContent = steps.length; stepIndex.textContent = 0; setFacts();
 }
 
-function resetAll() {
+function getComparisonCount(algo, arr) {
+  let count = 0; const a = [...arr];
+  if (algo === 'merge') {
+    function ms(b) {
+      if (b.length <= 1) return b;
+      const m = Math.floor(b.length / 2);
+      const L = ms(b.slice(0, m)), R = ms(b.slice(m));
+      const res = []; let i = 0, j = 0;
+      while (i < L.length && j < R.length) {
+        count++;
+        if (L[i] <= R[j]) res.push(L[i++]); else res.push(R[j++]);
+      }
+      return res.concat(L.slice(i)).concat(R.slice(j));
+    }
+    ms(a);
+  } else {
+    function qs(b, l, r) {
+      if (l >= r) return;
+      if (r - l === 1) { count++; if (b[l] > b[r]) [b[l], b[r]] = [b[r], b[l]]; return; }
+      const c = Math.floor((l + r) / 2);
+      count++; if (b[l] > b[c]) [b[l], b[c]] = [b[c], b[l]];
+      count++; if (b[l] > b[r]) [b[l], b[r]] = [b[r], b[l]];
+      count++; if (b[c] > b[r]) [b[c], b[r]] = [b[r], b[c]];
+      [b[c], b[r - 1]] = [b[r - 1], b[c]];
+      const pv = b[r - 1]; let i = l + 1, j = r - 2;
+      while (true) {
+        while (i <= j) { count++; if (b[i] < pv) i++; else break; }
+        while (i <= j) { count++; if (b[j] > pv) j--; else break; }
+        if (i < j) { [b[i], b[j]] = [b[j], b[i]]; i++; j--; } else break;
+      }
+      [b[r - 1], b[i]] = [b[i], b[r - 1]];
+      qs(b, l, i - 1); qs(b, i + 1, r);
+    }
+    qs(a, 0, a.length - 1);
+  }
+  return count;
+}
+
+function resetVisualization() {
   if (autoRunInterval) { clearInterval(autoRunInterval); autoRunInterval = null; autoRunBtn.textContent = 'Auto Run'; autoRunBtn.classList.remove('danger'); autoRunBtn.classList.add('primary') }
   prevStep.disabled = false; nextStep.disabled = false;
   speedMenu.classList.add('hidden'); autoRunSpeed = null;
   baseArray = []; originalArray = []; steps = []; curStep = -1; stepCounter = 0; comparisonCount = 0;
   originalArrayEl.textContent = '-'; pseudoContainer.innerHTML = '';
   stepIndex.textContent = 0; stepTotal.textContent = 0;
-  nRange.value = 0; nValue.textContent = '0'; nRange.disabled = false; nValue.parentElement.style.opacity = '1';
-  arrayType.value = "random"; customInputContainer.classList.add('hidden'); customArrayInput.value = "";
-  algoSelect.value = ""; selectedAlgoName = '';
-  advancedAnalysisBox.classList.add('hidden');
   factsText.textContent = 'Select an algorithm to view facts.';
   treeData = null; treeCanvas.innerHTML = ''; opLabel.textContent = ''; opCells.innerHTML = '';
+}
+
+function resetLeftPanel() {
+  nRange.value = 0; nValue.textContent = '0';
+  nRange.disabled = false; nValue.parentElement.style.opacity = '1';
+  arrayType.value = "random";
+  customInputContainer.classList.add('hidden');
+  customArrayInput.value = "";
+}
+
+function resetAll() {
+  resetVisualization();
 }
 
 function setFacts() {
@@ -540,56 +704,4 @@ function setFacts() {
   }
 }
 
-// ===== GRAPH =====
-advancedBtn.addEventListener('click', () => openGraphModal());
-closeBtn.addEventListener('click', closeGraphModal);
-overlay.addEventListener('click', closeGraphModal);
-inputSizeDropdown.addEventListener('change', () => drawScalabilityGraph());
 
-function openGraphModal() {
-  if (!algoSelect.value) { graphMessage.textContent = 'Select algorithm first.'; graphMessage.classList.remove('hidden'); canvas.style.display = 'none' }
-  else { graphMessage.classList.add('hidden'); canvas.style.display = 'block'; inputSizeDropdown.value = ''; canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height) }
-  overlay.classList.remove('hidden'); modal.classList.remove('hidden'); document.body.classList.add('modal-open');
-}
-function closeGraphModal() {
-  overlay.classList.add('hidden'); modal.classList.add('hidden'); document.body.classList.remove('modal-open');
-  inputSizeDropdown.value = ''; canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-}
-function msSmp(a) { if (a.length <= 1) return a; const m = Math.floor(a.length / 2); return mgSmp(msSmp(a.slice(0, m)), msSmp(a.slice(m))) }
-function mgSmp(l, r) { const res = []; let i = 0, j = 0; while (i < l.length && j < r.length) { if (l[i] <= r[j]) res.push(l[i++]); else res.push(r[j++]) } return res.concat(l.slice(i)).concat(r.slice(j)) }
-function qsSmp(a, l, r) { if (l >= r) return; const p = a[Math.floor((l + r) / 2)]; let i = l, j = r; while (i <= j) { while (a[i] < p) i++; while (a[j] > p) j--; if (i <= j) { [a[i], a[j]] = [a[j], a[i]]; i++; j-- } } qsSmp(a, l, j); qsSmp(a, i, r) }
-function measureTime(n) {
-  let t; if (arrayType.value === 'random') t = Array.from({ length: n }, () => Math.floor(Math.random() * 99) + 1);
-  else if (arrayType.value === 'asc') t = Array.from({ length: n }, (_, i) => i + 1); else t = Array.from({ length: n }, (_, i) => n - i);
-  const a = [...t]; const R = 20; let tot = 0;
-  for (let i = 0; i < R; i++) {
-    const tmp = [...a]; const s = performance.now();
-    if (algoSelect.value === 'merge') msSmp(tmp); else qsSmp(tmp, 0, tmp.length - 1); tot += performance.now() - s
-  }
-  return tot / R;
-}
-function drawScalabilityGraph() {
-  if (!algoSelect.value) { graphMessage.textContent = 'Select algorithm.'; graphMessage.classList.remove('hidden'); canvas.style.display = 'none'; return }
-  if (!inputSizeDropdown.value) { graphMessage.textContent = 'Select N value.'; graphMessage.classList.remove('hidden'); canvas.style.display = 'none'; return }
-  graphMessage.classList.add('hidden'); canvas.style.display = 'block';
-  const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const maxN = Number(inputSizeDropdown.value); const step = maxN / 10; const nVals = [];
-  for (let i = 1; i <= 10; i++)nVals.push(Math.round(i * step));
-  const tVals = []; let prev = 0; nVals.forEach(n => { let t = measureTime(n); if (t < prev) t = prev + 0.001; prev = t; tVals.push(t) });
-  const lm = 80, rm = 40, tm = 70, bm = 60; const w = canvas.width - lm - rm, h = canvas.height - tm - bm; const maxT = Math.max(...tVals) * 1.1;
-  const an = algoSelect.value === 'merge' ? 'Merge Sort' : 'Quick Sort';
-  ctx.fillStyle = '#1e293b'; ctx.font = 'bold 18px Arial'; ctx.textAlign = 'center'; ctx.fillText(`${an} - Input Size vs Time`, canvas.width / 2, 30);
-  ctx.beginPath(); ctx.moveTo(lm, tm); ctx.lineTo(lm, canvas.height - bm); ctx.lineTo(canvas.width - rm, canvas.height - bm); ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2; ctx.stroke();
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; for (let i = 0; i <= 5; i++) { const y = canvas.height - bm - (h * i) / 5; ctx.beginPath(); ctx.moveTo(lm, y); ctx.lineTo(canvas.width - rm, y); ctx.stroke() }
-  ctx.strokeStyle = '#ee2f2f'; ctx.lineWidth = 3; ctx.beginPath();
-  tVals.forEach((t, i) => { const x = lm + (w * (i + 1)) / 11; const y = canvas.height - bm - (t / maxT) * h; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y) }); ctx.stroke();
-  ctx.fillStyle = '#ef4444'; tVals.forEach((t, i) => { const x = lm + (w * (i + 1)) / 11; const y = canvas.height - bm - (t / maxT) * h; ctx.beginPath(); ctx.arc(x, y, 6, 0, 2 * Math.PI); ctx.fill(); ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2; ctx.stroke() });
-  ctx.fillStyle = '#080a0e'; ctx.font = '12px Arial'; ctx.textAlign = 'center'; ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 2;
-  nVals.forEach((n, i) => { const x = lm + (w * (i + 1)) / 11; const y = canvas.height - bm; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 6); ctx.stroke(); ctx.fillText(n.toString(), x, y + 25) });
-  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-  for (let i = 0; i <= 5; i++) { const y = canvas.height - bm - (h * i) / 5; const v = (maxT * i / 5).toFixed(2); ctx.strokeStyle = '#0c0f15'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(lm - 6, y); ctx.lineTo(lm, y); ctx.stroke(); ctx.fillText(v, lm - 10, y) }
-  ctx.fillStyle = '#060709'; ctx.font = 'bold 14px Arial'; ctx.textAlign = 'center'; ctx.fillText('Input Size (n)', lm + w / 2, canvas.height - 20);
-  ctx.save(); ctx.translate(25, tm + h / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Execution Time (ms)', 0, 0); ctx.restore();
-  graphMessage.innerHTML = algoSelect.value === 'quick' ? '<strong>Quick Sort: O(n log n) avg with pivot variation.</strong>' : '<strong>Merge Sort: predictable O(n log n) growth.</strong>';
-  graphMessage.classList.remove('hidden');
-}

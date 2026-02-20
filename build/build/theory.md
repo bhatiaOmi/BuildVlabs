@@ -2,48 +2,56 @@
 
 Sorting is a fundamental operation in computer science that involves arranging elements of a dataset in a specified order, typically in ascending or descending order. Efficient sorting is essential because many operations such as searching, indexing, data analysis, and optimization perform significantly faster on sorted data.
 
-Among various sorting techniques, **Divide and Conquer–based algorithms** are widely used due to their efficiency and systematic approach. These algorithms break a large problem into smaller subproblems, solve them independently, and combine the results to obtain the final solution. Two important sorting algorithms based on this paradigm are **Merge Sort** and **Quick Sort**, both of which are studied and visualized in this experiment.
+Among various sorting techniques, Divide and Conquer–based algorithms are widely used due to their efficiency and structured approach. These algorithms decompose a large problem into smaller subproblems, solve them independently, and then combine their results to obtain the final solution. In this experiment, two important Divide and Conquer sorting algorithms—Merge Sort and Quick Sort—are studied and visualized.
 
 ### Divide and Conquer Paradigm
 
-The Divide and Conquer strategy operates using three fundamental steps:
-1. **Divide**  
+The Divide and Conquer strategy consists of three fundamental steps:
+
+1. **Divide**
    The given problem is divided into smaller subproblems of the same type.
-2. **Conquer**  
-   Each subproblem is solved recursively until it becomes simple enough to be solved directly.
-3. **Combine**  
-   The solutions of the subproblems are combined to obtain the final solution.
-This paradigm significantly reduces computational complexity for large input sizes and forms the theoretical foundation of efficient sorting algorithms such as Merge Sort and Quick Sort.
+
+2. **Conquer**
+   Each subproblem is solved recursively until it becomes simple enough to solve directly.
+
+3. **Combine**
+   The solutions of the subproblems are combined to produce the final solution.
+
+This paradigm significantly reduces computational complexity for large input sizes and forms the theoretical foundation of efficient sorting algorithms.
 
 ### Merge Sort
-Merge Sort is a **stable, comparison-based sorting algorithm** that strictly follows the divide and conquer approach. It uses a recursive strategy and guarantees predictable performance for all types of input.
+
+Merge Sort is a stable, comparison-based sorting algorithm that strictly follows the Divide and Conquer approach. Its performance is predictable and independent of the initial arrangement of elements.
 
 #### Working Principle
-- The input array is recursively divided into two halves.
-- The division continues until each subarray contains only one element.
-- Since a single element is inherently sorted, adjacent subarrays are merged in sorted order.
-- The merging process continues until the entire array is merged into one sorted array.
-### Example of Merge Sort
-Consider the array:
-**[8, 3, 5, 2]**
+
+1. The input array is recursively divided into two halves.
+2. The division continues until each subarray contains only one element.
+3. Since a single element is inherently sorted, adjacent subarrays are merged in sorted order.
+4. The merging process continues until the entire array is merged into one sorted array.
+
+The divide and merge process is clearly illustrated in the visualization, showing how the array is broken down and then reconstructed in sorted order.
+
+#### Example of Merge Sort
+Consider the array: **[70, 30, 50, 10]**
 
 **Step 1: Divide**
-- Split into two halves:  
-  `[8, 3]` and `[5, 2]`
+Split the array into two halves: `[70, 30]` and `[50, 10]`
 
 **Step 2: Recursive Division**
-- `[8, 3] → [8] and [3]`  
-- `[5, 2] → [5] and [2]`
+Further split down to individual elements: `[70], [30]` and `[50], [10]`
 
 **Step 3: Merge**
-- Merge `[8]` and `[3] → [3, 8]`  
-- Merge `[5]` and `[2] → [2, 5]`
+Compare and merge elements into sorted subarrays: `[30, 70]` and `[10, 50]`
 
 **Step 4: Final Merge**
-- Merge `[3, 8]` and `[2, 5] → [2, 3, 5, 8]`
-This step-by-step splitting and merging process is visualized in the simulation.
+Combine the sorted halves into the final sorted array: `[10, 30, 50, 70]`
 
-### Characteristics of Merge Sort
+<p align="center">
+  <img src="images/Mergeimage.png" width="700">
+</p>
+
+#### Characteristics of Merge Sort
 
 - **Time Complexity**
   - Best Case: O(n log n)
@@ -59,83 +67,99 @@ This step-by-step splitting and merging process is visualized in the simulation.
 - **Performance**
   - Independent of input order and highly predictable.
 
-Merge Sort is suitable for large datasets, linked lists, and scenarios where stability is required.
+Merge Sort is well-suited for large datasets, linked lists, and applications where stability is required.
+
+---
 
 ### Quick Sort
 
-Quick Sort is a **highly efficient in-place sorting algorithm** that also follows the divide and conquer strategy. Unlike Merge Sort, it does not use extra memory for merging but relies on an effective partitioning mechanism.
-In this experiment, **Median-of-Three pivot selection** is used to improve performance.
+Quick Sort is a highly efficient, in-place, comparison-based sorting algorithm that also follows the Divide and Conquer paradigm. Unlike Merge Sort, Quick Sort does not use extra memory for merging; instead, it relies on an effective partitioning mechanism.
 
-### Working Principle (Median-of-Three Pivot Selection)
+In this experiment, Median-of-Three pivot selection is used to improve performance and reduce the likelihood of worst-case behavior.
 
-- The pivot is chosen as the median of:
-  - The first element
-  - The middle element
-  - The last element
+#### Working of Quick Sort (Median-of-Three Pivot Selection)
 
-- Two pointers are used:
-  - Pointer **i** moves from left to right.
-  - Pointer **j** moves from right to left.
+**1. Pivot Selection**
+Three elements are selected from the array:
+- The first element
+- The middle element
+- The last element
 
-- Elements smaller than the pivot are moved to the left.
-- Elements greater than the pivot are moved to the right.
-- When pointers cross, the pivot is placed in its correct position.
-- The same process is recursively applied to left and right subarrays.
+These three values are compared, and the median value (neither the smallest nor the largest) is chosen as the pivot. For example, if the values are a, b, and c:
+- If a > b > c or c > b > a, then b is selected as the pivot.
 
-### Example of Quick Sort
+To simplify partitioning, the selected pivot is temporarily placed at the `end - 1` index of the array. This strategy avoids poor pivot choices and improves overall performance.
 
-Consider the array:
+**2. Partitioning Process**
+Two pointers are used:
+- Pointer **i** moves from left to right.
+- Pointer **j** moves from right to left.
 
-**[8, 3, 5, 2]**
+Pointer **i** advances while elements are smaller than the pivot. Pointer **j** moves backward while elements are greater than the pivot. When both pointers stop and `i < j`, the elements at these positions are swapped. This process continues until the pointers cross. Finally, the pivot is placed in its correct sorted position.
+
+After partitioning:
+- All elements smaller than the pivot are positioned on the left.
+- All elements greater than the pivot are positioned on the right.
+
+The same steps are recursively applied to the left and right subarrays.
+
+#### Example of Quick Sort
+Consider the array: **[70, 30, 50, 10]**
 
 **Step 1: Pivot Selection**
-- First = 8, Middle = 3, Last = 2  
-- Median-of-Three pivot = **3**
+- First = 70, Middle = 30, Last = 10
+- Median-of-Three pivot = **30** (since 10 < 30 < 70)
 
 **Step 2: Partitioning**
-- Elements less than 3 → `[2]`  
-- Pivot → `[3]`  
-- Elements greater than 3 → `[8, 5]`
+- Elements less than 30 → `[10]`
+- Pivot → `[30]`
+- Elements greater than 30 → `[70, 50]`
 
 **Step 3: Recursive Sorting**
-- Sort `[2]` → already sorted  
-- Sort `[8, 5]`:
-  - Pivot = 8
-  - Partition → `[5, 8]`
+- Sort `[10]` → already sorted
+- Sort `[70, 50]`:
+  - Pivot = 50 (based on sub-range selection)
+  - Partition → `[50, 70]`
 
-**Final Sorted Array**
-- **[2, 3, 5, 8]**
-These pointer movements, swaps, and pivot placements are visualized step-by-step in the simulation.
+**Final Sorted Array: [10, 30, 50, 70]**
 
-### Characteristics of Quick Sort
+<p align="center">
+  <img src="images/Quickimage.png" width="400">
+</p>
+
+#### Characteristics of Quick Sort
 
 - **Time Complexity**
   - Best Case: O(n log n)
   - Average Case: O(n log n)
-  - Worst Case: O(n²) (rare with median-of-three strategy)
+  - Worst Case: O(n²) (rare with Median-of-Three selection)
 
 - **Space Complexity**
   - In-place; requires only recursive stack space.
 
 - **Stability**
-  - Not stable; relative order of equal elements may change.
+  - Not stable; the relative order of equal elements may change.
 
 - **Performance Dependency**
-  - Highly dependent on pivot selection and input distribution.
+  - Strongly dependent on pivot selection and input distribution.
 
-Median-of-Three pivot selection significantly reduces the probability of worst-case behavior, making Quick Sort efficient for practical applications.
+Median-of-Three pivot selection significantly reduces the probability of worst-case behavior, making Quick Sort highly efficient in practice.
+
+---
 
 ### Comparison of Merge Sort and Quick Sort
 
 | Feature | Merge Sort | Quick Sort |
-|------|-----------|-----------|
-| Strategy | Divide and merge | Divide via partitioning |
-| Time Complexity | O(n log n) (all cases) | O(n log n) average |
-| Space Usage | Extra memory required | In-place |
-| Stability | Stable | Not stable |
-| Input Sensitivity | Independent of input order | Depends on pivot selection |
-| Practical Speed | Moderate | Usually faster |
+| :--- | :--- | :--- |
+| **Strategy** | Divide and merge | Divide via partitioning |
+| **Time Complexity** | O(n log n) (all cases) | O(n log n) average |
+| **Space Usage** | Extra memory required | In-place |
+| **Stability** | Stable | Not stable |
+| **Input Sensitivity** | Independent of input order | Depends on pivot selection |
+| **Practical Speed** | Moderate | Usually faster |
+
+---
 
 ### Conclusion
 
-This experiment demonstrates how the **Divide and Conquer paradigm** is applied to sorting using Merge Sort and Quick Sort. Through step-by-step visualization, the recursive division, merging, partitioning, and pivot selection processes become clear. While Merge Sort provides stable and predictable performance, Quick Sort offers superior practical speed with optimized pivot selection. The experiment highlights their operational differences, efficiency, and suitability for different types of input.
+This experiment demonstrates the application of the Divide and Conquer paradigm to sorting through Merge Sort and Quick Sort. Merge Sort provides stable and consistent performance, while Quick Sort achieves superior practical speed through efficient partitioning and optimized pivot selection. The visualization effectively illustrates recursive division, pivot selection, pointer scanning, comparison behavior, and final array construction, leading to a clear understanding of both algorithms and their operational differences.

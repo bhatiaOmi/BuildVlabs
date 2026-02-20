@@ -8,4 +8,6 @@ Introduction to Algorithms, 3rd Edition, MIT Press, 2009.
 Algorithms, 4th Edition, Addison-Wesley, 2011.
 – Detailed explanation of Quick Sort optimizations, including median-of-three pivot selection.
 
-
+3. GeeksforGeeks - Data Structures and Algorithms
+https://www.geeksforgeeks.org/dsa/
+– Comprehensive tutorials and examples for Merge Sort and Quick Sort.
