@@ -93,72 +93,106 @@ function mkNode(arr) { return { arr: arr.slice(), left: null, right: null, merge
 // ===== MERGE SORT =====
 function mergeSortTrace(arr) {
   treeData = mkNode(arr);
-  function rec(a, node) {
-    steps.push({
-      type: 'split', desc: `Split Subarray: [${a.join(', ')}]`, tree: { node, phase: 'split' },
-      vis: { cells: a.map((v, i) => ({ val: v })), label: 'Split Subarray' }, step: ++stepCounter
-    });
-    if (a.length <= 1) {
-      node.merged = a.slice();
-      steps.push({
-        type: 'base', desc: `Base Case: [${a.join(', ')}] is already sorted.`, tree: { node, phase: 'base' },
-        vis: { cells: a.map(v => ({ val: v, cls: 'hl-placed', top: '✓' })), label: 'Base Case: already sorted' }, step: ++stepCounter
-      });
-      return a;
-    }
-    const mid = Math.floor(a.length / 2), L = a.slice(0, mid), R = a.slice(mid);
-    node.left = mkNode(L); node.right = mkNode(R);
+  const fullArr = [...arr]; // Working copy
 
-    // Divide step: show split point clearly
-    const dc = [];
-    for (let i = 0; i < mid; i++) dc.push({ val: a[i], cls: 'hl-left', top: i === 0 ? 'Left' : '' });
-    dc.push({ sep: '|' });
-    for (let i = mid; i < a.length; i++) dc.push({ val: a[i], cls: 'hl-right', top: i === mid ? 'Right' : '' });
+  function rec(a, l, r, node) {
+    const sub = a.slice(l, r + 1);
     steps.push({
-      type: 'divide', desc: `Divide into Left [${L.join(', ')}] and Right [${R.join(', ')}]`,
+      type: 'split', desc: `Split Subarray: [${sub.join(', ')}]`, tree: { node, phase: 'split' },
+      vis: { cells: sub.map(v => ({ val: v })), label: 'Split Subarray' }, step: ++stepCounter
+    });
+
+    if (l >= r) {
+      node.merged = [a[l]];
+      steps.push({
+        type: 'base', desc: `Base Case: ${a[l]} is already sorted.`, tree: { node, phase: 'base' },
+        vis: {
+          cells: a.map((v, idx) => ({
+            val: v,
+            cls: idx === l ? 'hl-placed' : 'hl-dim',
+            top: idx === l ? '✓' : ''
+          })),
+          label: 'Base Case'
+        }, step: ++stepCounter
+      });
+      return [a[l]];
+    }
+
+    const mid = l + Math.floor((r - l) / 2);
+    const L_arr = a.slice(l, mid + 1);
+    const R_arr = a.slice(mid + 1, r + 1);
+    node.left = mkNode(L_arr);
+    node.right = mkNode(R_arr);
+
+    // Divide step
+    const dc = [];
+    for (let i = l; i <= mid; i++) dc.push({ val: a[i], cls: 'hl-left', top: i === l ? 'Left' : '' });
+    dc.push({ sep: '|' });
+    for (let i = mid + 1; i <= r; i++) dc.push({ val: a[i], cls: 'hl-right', top: i === mid + 1 ? 'Right' : '' });
+
+    steps.push({
+      type: 'divide', desc: `Divide into Left [${L_arr.join(', ')}] and Right [${R_arr.join(', ')}]`,
       tree: { node, phase: 'divide' }, vis: { cells: dc, label: 'Divide Step' }, step: ++stepCounter
     });
 
-    const sL = rec(L, node.left), sR = rec(R, node.right);
+    const sL = rec(a, l, mid, node.left);
+    const sR = rec(a, mid + 1, r, node.right);
 
-    // Merge start label
+    // Merge start
     const mc = [];
     sL.forEach((v, i) => mc.push({ val: v, cls: 'hl-left', top: i === 0 ? 'Left' : '' }));
     mc.push({ sep: '+' });
     sR.forEach((v, i) => mc.push({ val: v, cls: 'hl-right', top: i === 0 ? 'Right' : '' }));
+
     steps.push({
       type: 'merge-start', desc: `Preparing to Merge [${sL.join(', ')}] and [${sR.join(', ')}]`,
       tree: { node, phase: 'merge-start' }, vis: { cells: mc, label: 'Merge' }, step: ++stepCounter
     });
 
-    const merged = []; let i = 0, j = 0;
+    const merged = [];
+    let i = 0, j = 0;
     while (i < sL.length && j < sR.length) {
       const cc = [];
       sL.forEach((v, k) => cc.push({ val: v, cls: k === i ? 'hl-compare' : '', top: k === i ? 'i' : '' }));
       cc.push({ sep: 'vs' });
       sR.forEach((v, k) => cc.push({ val: v, cls: k === j ? 'hl-compare' : '', top: k === j ? 'j' : '' }));
-      if (merged.length) { cc.push({ sep: '→' }); merged.forEach(v => cc.push({ val: v, cls: 'hl-placed' })) }
+      if (merged.length) {
+        cc.push({ sep: '→' });
+        merged.forEach(v => cc.push({ val: v, cls: 'hl-placed' }));
+      }
       steps.push({
         type: 'compare', desc: `Compare ${sL[i]} vs ${sR[j]}`,
         tree: { node, phase: 'merging' }, vis: { cells: cc, label: 'Compare' }, step: ++stepCounter
       });
-      if (sL[i] <= sR[j]) merged.push(sL[i++]); else merged.push(sR[j++]);
 
-      // Placed step
+      if (sL[i] <= sR[j]) {
+        merged.push(sL[i++]);
+      } else {
+        merged.push(sR[j++]);
+      }
+
+      // Show placement
       const pc = [];
       sL.forEach((v, k) => pc.push({ val: v, cls: k === i ? 'hl-compare' : '', top: k === i ? 'i' : '' }));
       pc.push({ sep: '+' });
       sR.forEach((v, k) => pc.push({ val: v, cls: k === j ? 'hl-compare' : '', top: k === j ? 'j' : '' }));
-      pc.push({ sep: '→' }); merged.forEach(v => pc.push({ val: v, cls: 'hl-placed' }));
+      pc.push({ sep: '→' });
+      merged.forEach(v => pc.push({ val: v, cls: 'hl-placed' }));
+
       steps.push({
         type: 'place', desc: `Placed ${merged[merged.length - 1]} into merged result`,
         tree: { node, phase: 'merging' }, vis: { cells: pc, label: 'Merged' }, step: ++stepCounter
       });
     }
+
     while (i < sL.length) merged.push(sL[i++]);
     while (j < sR.length) merged.push(sR[j++]);
+
     node.merged = merged.slice();
-    for (let k = 0; k < merged.length; k++) a[k] = merged[k];
+    // Update the array 'a' for subsequent merges
+    for (let k = 0; k < merged.length; k++) {
+      a[l + k] = merged[k];
+    }
 
     steps.push({
       type: 'merge-done', desc: `Merged Subarray Result → [${merged.join(', ')}]`,
@@ -167,7 +201,7 @@ function mergeSortTrace(arr) {
     });
     return merged;
   }
-  rec(arr, treeData);
+  rec(fullArr, 0, arr.length - 1, treeData);
 }
 
 // ===== QUICK SORT =====
