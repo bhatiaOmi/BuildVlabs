@@ -356,14 +356,14 @@
                 
                 
                   <div class="question beginner">
-                    Which of the following best describes the divide and conquer technique?
+                    Which of the following scenarios best represents the advantage of Divide and Conquer algorithms like Merge Sort or Quick Sort?
                   </div>
                   
                   <div class="answers">
                     <div id="answer0a">
                       <label>
                         <input type="radio" name="question0" value="a">
-                        a: Solving a problem by trying all possible solutions
+                        a: When the dataset is very small
                       </label>
                       <a href="#" id="explanation0a" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -371,7 +371,7 @@
                     <div id="answer0b">
                       <label>
                         <input type="radio" name="question0" value="b">
-                        b: Dividing a problem into smaller sub-problems, solving them, and combining the results
+                        b: When problems can be broken into independent smaller parts
                       </label>
                       <a href="#" id="explanation0b" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -379,7 +379,7 @@
                     <div id="answer0c">
                       <label>
                         <input type="radio" name="question0" value="c">
-                        c: Solving a problem iteratively using loops
+                        c: When only one comparison is needed
                       </label>
                       <a href="#" id="explanation0c" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -387,7 +387,7 @@
                     <div id="answer0d">
                       <label>
                         <input type="radio" name="question0" value="d">
-                        d: Sorting elements by comparing adjacent values
+                        d: When recursion is not allowed
                       </label>
                       <a href="#" id="explanation0d" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -473,14 +473,14 @@
                 </div>
                 
                   <div class="question beginner">
-                    Which of the following is a common application of sorting algorithms?
+                    Which of the following best describes the divide and conquer technique?
                   </div>
                   
                   <div class="answers">
                     <div id="answer3a">
                       <label>
                         <input type="radio" name="question3" value="a">
-                        a: Encrypting data
+                        a: Solving a problem by trying all possible solutions
                       </label>
                       <a href="#" id="explanation3a" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -488,7 +488,7 @@
                     <div id="answer3b">
                       <label>
                         <input type="radio" name="question3" value="b">
-                        b: Searching data efficiently
+                        b: Dividing a problem into smaller sub-problems, solving them, and combining the results
                       </label>
                       <a href="#" id="explanation3b" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -496,7 +496,7 @@
                     <div id="answer3c">
                       <label>
                         <input type="radio" name="question3" value="c">
-                        c: Compressing files
+                        c: Solving a problem iteratively using loops
                       </label>
                       <a href="#" id="explanation3c" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -504,7 +504,7 @@
                     <div id="answer3d">
                       <label>
                         <input type="radio" name="question3" value="d">
-                        d: Generating random numbers
+                        d: Sorting elements by comparing adjacent values
                       </label>
                       <a href="#" id="explanation3d" class="accordion" onclick="return false;">Explanation</a>
                     </div>
@@ -555,7 +555,7 @@
           </div>
             
             <script>
-              const myQuestions = [{"question":"Which of the following best describes the divide and conquer technique?","answers":{"a":"Solving a problem by trying all possible solutions","b":"Dividing a problem into smaller sub-problems, solving them, and combining the results","c":"Solving a problem iteratively using loops","d":"Sorting elements by comparing adjacent values"},"explanations":{"a":"This describes brute-force techniques, not divide and conquer.","b":"Divide and conquer works by breaking a problem into smaller parts, solving them recursively, and combining results.","c":"Iterative approaches use loops rather than recursion.","d":"This describes bubble sort, not the divide and conquer paradigm."},"correctAnswer":"b","difficulty":"beginner"},{"question":"What is the primary reason for using sorting algorithms in computer science?","answers":{"a":"To reduce memory usage","b":"To improve data security","c":"To organize data for efficient searching and processing","d":"To increase program length"},"explanations":{"a":"Sorting may increase memory usage depending on the algorithm.","b":"Sorting does not directly improve security.","c":"Sorted data allows faster searching and easier data processing.","d":"Program length is unrelated to sorting."},"correctAnswer":"c","difficulty":"beginner"},{"question":"What is the time complexity of Merge Sort in the worst case?","answers":{"a":"O(n)","b":"O(n log n)","c":"O(n²)","d":"O(log n)"},"explanations":{"a":"Merge Sort always processes all elements at each level.","b":"Merge Sort divides the array log n times and merges n elements at each level.","c":"Quadratic time is typical of simple sorts like bubble sort.","d":"Logarithmic time alone is insufficient to process all elements."},"correctAnswer":"b","difficulty":"beginner"},{"question":"Which of the following is a common application of sorting algorithms?","answers":{"a":"Encrypting data","b":"Searching data efficiently","c":"Compressing files","d":"Generating random numbers"},"explanations":{"a":"Encryption is related to security, not sorting.","b":"Sorting helps improve the efficiency of searching algorithms like binary search.","c":"File compression does not rely on sorting.","d":"Random number generation does not require sorted data."},"correctAnswer":"b","difficulty":"beginner"},{"question":"In Quick Sort, what is the role of the pivot element?","answers":{"a":"It stores the final sorted array","b":"It divides the array into two subarrays based on comparison","c":"It determines the size of the input array","d":"It is always the smallest element"},"explanations":{"a":"The pivot does not store the sorted array.","b":"The pivot partitions the array into elements smaller and larger than itself.","c":"Array size is independent of the pivot.","d":"The pivot can be any element depending on selection strategy."},"correctAnswer":"b","difficulty":"beginner"}];
+              const myQuestions = [{"question":"Which of the following scenarios best represents the advantage of Divide and Conquer algorithms like Merge Sort or Quick Sort?","answers":{"a":"When the dataset is very small","b":"When problems can be broken into independent smaller parts","c":"When only one comparison is needed","d":"When recursion is not allowed"},"explanations":{"a":"Divide and Conquer is not specifically for small datasets; its strength lies in handling large problems efficiently.","b":"Correct — it works best when a problem can be divided into smaller independent sub-problems and then combined.","c":"Divide and Conquer involves multiple comparisons, not just one.","d":"Recursion is a core part of Divide and Conquer, so this is incorrect."},"correctAnswer":"b","difficulty":"beginner"},{"question":"What is the primary reason for using sorting algorithms in computer science?","answers":{"a":"To reduce memory usage","b":"To improve data security","c":"To organize data for efficient searching and processing","d":"To increase program length"},"explanations":{"a":"Sorting may increase memory usage depending on the algorithm.","b":"Sorting does not directly improve security.","c":"Sorted data allows faster searching and easier data processing.","d":"Program length is unrelated to sorting."},"correctAnswer":"c","difficulty":"beginner"},{"question":"What is the time complexity of Merge Sort in the worst case?","answers":{"a":"O(n)","b":"O(n log n)","c":"O(n²)","d":"O(log n)"},"explanations":{"a":"Merge Sort always processes all elements at each level.","b":"Merge Sort divides the array log n times and merges n elements at each level.","c":"Quadratic time is typical of simple sorts like bubble sort.","d":"Logarithmic time alone is insufficient to process all elements."},"correctAnswer":"b","difficulty":"beginner"},{"question":"Which of the following best describes the divide and conquer technique?","answers":{"a":"Solving a problem by trying all possible solutions","b":"Dividing a problem into smaller sub-problems, solving them, and combining the results","c":"Solving a problem iteratively using loops","d":"Sorting elements by comparing adjacent values"},"explanations":{"a":"This describes brute-force techniques, not divide and conquer.","b":"Divide and conquer works by breaking a problem into smaller parts, solving them recursively, and combining results.","c":"Iterative approaches use loops rather than recursion.","d":"This describes bubble sort, not the divide and conquer paradigm."},"correctAnswer":"b","difficulty":"beginner"},{"question":"In Quick Sort, what is the role of the pivot element?","answers":{"a":"It stores the final sorted array","b":"It divides the array into two subarrays based on comparison","c":"It determines the size of the input array","d":"It is always the smallest element"},"explanations":{"a":"The pivot does not store the sorted array.","b":"The pivot partitions the array into elements smaller and larger than itself.","c":"Array size is independent of the pivot.","d":"The pivot can be any element depending on selection strategy."},"correctAnswer":"b","difficulty":"beginner"}];
             </script>
               <script src="./assets/js/assessment_v2.js"></script>  
           <div class="bug-report-mobile">
