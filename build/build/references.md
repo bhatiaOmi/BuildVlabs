@@ -12,5 +12,10 @@
    *Algorithm Design*, Pearson, 2006.  
    – Explanation of divide-and-conquer techniques and recurrence relations used in Merge Sort and Quick Sort.
 
+4. NPTEL – Data Structures and Algorithms  
+   https://nptel.ac.in/courses/106102064  
+   – Covers sorting algorithms including Merge Sort and Quick Sort.
 
-
+5. NPTEL – Merge Sort Module  
+   https://archive.nptel.ac.in/content/storage2/courses/106103069/Module_5/merge_sort1.htm  
+   – Detailed explanation of Merge Sort and divide-and-conquer approach.
