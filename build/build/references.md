@@ -2,15 +2,15 @@
 
 1. Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein  
    *Introduction to Algorithms*, 4th Edition, MIT Press, 2022.  
-   – Reference for divide-and-conquer strategy, Merge Sort, Quick Sort, and complexity analysis.
+   – Chapter 4: Divide-and-Conquer; Chapter 7: Quicksort 
 
 2. Robert Sedgewick, Kevin Wayne  
    *Algorithms*, 4th Edition, Addison-Wesley, 2011.  
-   – Detailed explanation of Quick Sort optimizations, including median-of-three pivot selection.
+   – Chapter 2: Sorting (Mergesort and Quicksort)  
 
 3. Jon Kleinberg, Éva Tardos  
    *Algorithm Design*, Pearson, 2006.  
-   – Explanation of divide-and-conquer techniques and recurrence relations used in Merge Sort and Quick Sort.
+   – Chapter 5: Divide and Conquer
 
 4. NPTEL – Data Structures and Algorithms  
    https://nptel.ac.in/courses/106102064  
